@@ -45,30 +45,11 @@ import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
 
-from tiepy.speckle.utils import get_subsets
+from tiepy.speckle.utils import get_subsets, reshape_to_2d
 from tqdm import tqdm
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
  
-def reshape_to_2d(data):
-    """
-    Reshape a 1D data array into a 2D array.
-    
-    This function takes a 1D data array and reshapes it into a 2D array of dimensions (nx, ny), where nx and ny
-    are the square roots of the length of the input data.
-    
-    Parameters:
-        data: The 1D data array to be reshaped. [numpy.ndarray]
-    
-    Returns:
-        numpy.ndarray: A 2D numpy array of dimensions (nx, ny) representing the reshaped data.
-    
-    Example:
-        >>> data = np.array([1, 2, 3, 4, 5, 6])
-        >>> reshaped_data = reshape_to_2d(data)
-    """
-    nx, ny = int(np.sqrt(data.shape[0])), int(np.sqrt(data.shape[0]))
-    return np.reshape(data, (nx, ny))
 
 def normalize_image(image):
     """

@@ -3,13 +3,9 @@ name: Build Documentation
 on:
   push:
   pull_request:
-  workflow_dispatch:
 
 jobs:
   build_docs:
-    # pull requests are a duplicate of a branch push if within the same repo.
-    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -45,13 +41,10 @@ jobs:
           # versions. Explicitly upgrade them because they often create
           # installation problems if out of date.
           python -m pip install --upgrade pip setuptools numpy
-
+    
           pip install .
           pip install -r requirements-dev.txt
           pip list
-
-      - name: Build Docs
-        run: make -C docs/ html
 
       - uses: actions/upload-artifact@v3
         with:
