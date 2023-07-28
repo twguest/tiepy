@@ -45,7 +45,7 @@ import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
 
-from tiepy.speckle.utils import get_subsets, reshape_to_2d
+from tiepy.speckle.utils import get_subsets, reshape_to_2d, construct_arrays
 from tqdm import tqdm
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -422,7 +422,7 @@ def process_subset_images(reference_image,
         peaks = (peak_x + corr_peaks[0], peak_y + corr_peaks[1])
  
         # Append the values to the corresponding lists in the results dictionary
-        results['subset_centers'].append(center)
+        results['subset_centers'].append((center[0], center[1]))
         results['subpixel_shifts'].append(peaks)
         results['shifts'].append(corr_peaks)
 
@@ -489,8 +489,26 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
     """
     subset, centers = get_subsets(sample_image, window_size = window_size, step_size = step_size, padding = padding)
     
-    results = process_subset_images(reference_image,
-                                    subset_images = subset,
-                                    subset_centers = centers,
-                                    plot=plot)
+    shift_results = process_subset_images(reference_image,
+                                          subset_images = subset,
+                                          subset_centers = centers,
+                                          plot=plot)
+    
+    results = {}
+    
+    
+    coords_x, coords_y, sx, sy = construct_arrays(shift_results['subset_centers'], shift_results['shifts'])
+    _, _, ssx, ssy = construct_arrays(shift_results['subset_centers'], shift_results['subpixel_shifts'])
+
+    
+    results['coords_x'] = coords_x
+    results['coords_y'] = coords_y
+    
+    results['shifts_x'] = sx
+    results['shifts_y'] = sy
+
+    results['subpixel_shifts_x'] = ssx
+    results['subpixel_shifts_y'] = ssy
+    
+    
     return results

@@ -39,7 +39,7 @@ with open(path.join(here, "requirements.txt")) as requirements_file:
 
 
 setup(
-    name="tiepy",
+    name="tiepy-xfel",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Solutions to the Transport of Intensity Equation in Python",
