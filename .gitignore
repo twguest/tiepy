@@ -83,3 +83,4 @@ target/
 
 # data locations
 docs/source/demo/data/
+*.h5
