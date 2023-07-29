@@ -23,12 +23,11 @@ def print_h5_keys(filename):
         dataset2
         dataset3
     """
-    with h5.File(filename, 'r') as f:
+    with h5.File(filename, "r") as f:
         keys = list(f.keys())
     print("Keys in the HDF5 file:")
     for key in keys:
         print(key)
-
 
 
 def get_keys(filename):
@@ -46,14 +45,14 @@ def get_keys(filename):
         >>> print(keys)
         ['dataset1', 'dataset2', 'dataset3']
     """
-    with h5.File(filename, 'r') as f:
+    with h5.File(filename, "r") as f:
         keys = list(f.keys())
     return keys
 
-    
+
 def load_key_from_virtual_h5(virtual_file, key):
     # Open the virtual HDF5 file
-    with h5.File(virtual_file, 'r') as f:
+    with h5.File(virtual_file, "r") as f:
         # Check if the key exists in the file
         if key not in f:
             raise ValueError(f"Key '{key}' not found in the HDF5 file.")
@@ -65,7 +64,6 @@ def load_key_from_virtual_h5(virtual_file, key):
         data = {name: np.array(dataset) for name, dataset in group.items()}
 
     return data
-
 
 
 def create_virtual_h5(directory, output_filename):
@@ -85,15 +83,19 @@ def create_virtual_h5(directory, output_filename):
         Virtual dataset created in virtual_data.h5
     """
     # Get list of all .h5 files in the directory
-    filepaths = [os.path.join(directory, filename) for filename in os.listdir(directory) if filename.endswith('.h5')]
-    
+    filepaths = [
+        os.path.join(directory, filename) for filename in os.listdir(directory) if filename.endswith(".h5")
+    ]
+
     # Create a dictionary to hold the virtual layouts for each group
     virtual_layouts = {}
 
     # For each file, create a virtual source for each dataset and add it to the corresponding layout
     for filepath in filepaths:
-        with h5.File(filepath, 'r') as f:
-            group_name = os.path.splitext(os.path.basename(filepath))[0]  # Use the filename (without extension) as the group name
+        with h5.File(filepath, "r") as f:
+            group_name = os.path.splitext(os.path.basename(filepath))[
+                0
+            ]  # Use the filename (without extension) as the group name
             virtual_layouts[group_name] = {}
             for key in f.keys():
                 vsource = h5.VirtualSource(filepath, key, shape=f[key].shape, dtype=f[key].dtype)
@@ -101,13 +103,12 @@ def create_virtual_h5(directory, output_filename):
                 virtual_layouts[group_name][key][:] = vsource
 
     # Create a virtual dataset for each layout
-    with h5.File(output_filename, 'w', libver='latest') as f:
+    with h5.File(output_filename, "w", libver="latest") as f:
         for group_name, layouts in virtual_layouts.items():
             for key, layout in layouts.items():
-                f.create_virtual_dataset(f'{group_name}/{key}', layout, fillvalue=0)
+                f.create_virtual_dataset(f"{group_name}/{key}", layout, fillvalue=0)
 
-    print(f'Virtual dataset created in {output_filename}')
-
+    print(f"Virtual dataset created in {output_filename}")
 
 
 def save_dict_to_h5(dictionary, filename):
@@ -128,7 +129,7 @@ def save_dict_to_h5(dictionary, filename):
         >>> save_dict_to_h5(data, 'data.h5')
         # Creates an HDF5 file 'data.h5' containing three datasets: 'dataset1', 'dataset2', and 'dataset3'.
     """
-    with h5.File(filename, 'w') as h5file:
+    with h5.File(filename, "w") as h5file:
         for key, value in dictionary.items():
             if all(isinstance(i, tuple) for i in value):
                 value = np.array(value)
@@ -152,11 +153,10 @@ def load_dict_from_h5(filename):
         {'dataset1': array([1, 2, 3]), 'dataset2': array([10, 20, 30]), 'dataset3': array(42)}
     """
     dictionary = {}
-    with h5.File(filename, 'r') as h5file:
+    with h5.File(filename, "r") as h5file:
         for key in h5file.keys():
             dictionary[key] = np.array(h5file[key])
     return dictionary
-
 
 
 def load_tiff_as_npy(filename):
@@ -170,12 +170,12 @@ def load_tiff_as_npy(filename):
         numpy.ndarray: The loaded image as a NumPy array.
     """
     import warnings
+
     warnings.filterwarnings("ignore")
-    
+
     try:
         image = imageio.imread(filename)
         return np.array(image)
     except Exception as e:
         print(f"Error loading TIFF file: {e}")
         return None
-
