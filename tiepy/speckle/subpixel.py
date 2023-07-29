@@ -45,6 +45,7 @@ import scipy.signal
 import matplotlib.pyplot as plt
 
 from tiepy.speckle.utils import get_subsets, reshape_to_2d, construct_arrays
+from tiepy.speckle.phase_retrieval import kottler
 from tqdm import tqdm
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
@@ -421,7 +422,7 @@ def process_subset_images(
     return results
 
 
-def process_single_image(reference_image, sample_image, window_size, step_size, padding=0, plot=False):
+def process_single_image(reference_image, sample_image, window_size, step_size, padding=0, plot=False, extra_metadata = {}):
     """
     Process a single image by extracting subsets, computing correlation, and subpixel shifts.
 
@@ -489,11 +490,17 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
         - The 'window_size' and 'step_size' should be positive integers.
         - The 'padding' should be a non-negative integer.
     """
+    
+    assert type(extra_metadata) == dict, "Metadata should be in dictionary format"
+    
     subset, centers = get_subsets(sample_image, window_size=window_size, step_size=step_size, padding=padding)
     shift_results = process_subset_images(reference_image, subset_images=subset, subset_centers=centers, plot=plot)
 
     results = {}
-
+    
+    # Add metadata to results
+    results.update(extra_metadata)
+    
     # Convert list of tuples to NumPy arrays for better structure
     coords_x, coords_y, shifts_x, shifts_y = construct_arrays(
         shift_results["subset_centers"], shift_results["shifts"]
@@ -513,5 +520,6 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
     results[
         "subpixel_shifts_y"
     ] = subpixel_shifts_y  # Vertical (y) subpixel shifts between the reference image and each subset image.
-
+    
+    
     return results

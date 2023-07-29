@@ -4,9 +4,8 @@ from numpy.fft import fftshift as fftshift
 from numpy.fft import ifftshift as ifftshift
 from numpy.fft import fft2 as fft2
 from numpy.fft import ifft2 as ifft2
-from numpy.fft import fftfreq as fftfreq
 
-from scipy.ndimage.filters import gaussian_filter
+
 from math import pi as pi
 from math import floor as floor
 
