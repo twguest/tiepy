@@ -85,7 +85,7 @@ def get_subsets(image, window_size, step_size, padding=0):
         for j in range(half_w + padding, ny - half_w - padding, step_size):
             subset = image[i - half_w:i + half_w, j - half_w:j + half_w]
             subsets.append(subset)
-            centers.append((i, j))
+            centers.append((i,j))
 
     return subsets, centers
 
@@ -164,7 +164,7 @@ def construct_arrays(coordinates, measurements):
 
     array_x, array_y  = np.meshgrid(unique_x, unique_y, indexing='ij')
 
-    array_m1 = np.reshape([meas[1] for meas in measurements], (m, n))
-    array_m2 = np.reshape([meas[0] for meas in measurements], (m, n))
+    array_m1 = np.reshape([meas[1] for meas in measurements], (n, m))
+    array_m2 = np.reshape([meas[0] for meas in measurements], (n, m))
 
-    return array_x, array_y, array_m1, array_m2
+    return array_x.T, array_y.T, array_m1, array_m2
