@@ -36,7 +36,9 @@ def kottler(dX, dY):
     Nx, Ny = dX.shape
     dqx = 2 * pi / Nx
     dqy = 2 * pi / Ny
-    Qx, Qy = np.meshgrid((np.arange(0, Ny) - floor(Ny / 2) - 1) * dqy, (np.arange(0, Nx) - floor(Nx / 2) - 1) * dqx)
+    Qx, Qy = np.meshgrid(
+        (np.arange(0, Ny) - floor(Ny / 2) - 1) * dqy, (np.arange(0, Nx) - floor(Nx / 2) - 1) * dqx
+    )
 
     polarAngle = np.arctan2(Qx, Qy)
     ftphi = fftshift(fft2(dX + i * dY)) * np.exp(i * polarAngle)

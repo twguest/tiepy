@@ -5,6 +5,7 @@ exec paganin algorithm
 import numpy as np
 from tqdm import tqdm
 
+
 def paganin_algorithm(ii, z, wav, delta, beta):
     """
     Paganin Algorithm for phase retrieval.
@@ -34,9 +35,8 @@ def paganin_algorithm(ii, z, wav, delta, beta):
         Journal of Microscopy, vol. 206, no. 1, pp. 33-40, 2002.
     """
 
-    
-    assert ii.dtype == 'float64'
-    
+    assert ii.dtype == "float64"
+
     phase = np.zeros_like(ii)
 
     Nx = ii.shape[0]
@@ -53,42 +53,33 @@ def paganin_algorithm(ii, z, wav, delta, beta):
         (np.arange(0, Nx) - np.floor(Nx / 2) - 1) * dkx,
     )
 
-    filtre = 1 + (
-        wav * z * delta * 4 * (np.pi**2) * (kx**2 + ky**2) / (4 * np.pi * beta)
-    )
-            
+    filtre = 1 + (wav * z * delta * 4 * (np.pi**2) * (kx**2 + ky**2) / (4 * np.pi * beta))
+
     for itr in tqdm(range(ii.shape[-1])):
-        
         for k in range(ii.shape[-2]):
-           
-            i1 = ii[:,:, k, itr]
+            i1 = ii[:, :, k, itr]
             i1 /= np.sum(i1)
-            i1-=np.mean(i1)
+            i1 -= np.mean(i1)
 
             trans_func = np.log(np.real(np.fft.ifft2(np.fft.fft2(i1 / flatfield) / filtre)))
             trans_func[np.isnan(trans_func)] = 0
-            
-            phase[:,:,k, itr] = (delta / (2 * beta)) * trans_func
-    
+
+            phase[:, :, k, itr] = (delta / (2 * beta)) * trans_func
+
     return phase
 
 
 if __name__ == "__main__":
-
     import sys
     import h5py as h5
-    
-    from felpy.utils.opt_utils import ekev2wav
-    
-    print(sys.argv)
-    
-        
-    with h5.File(sys.argv[1], "r") as hf:
-            
-        ii = hf.get('data')[()].T
 
-             
-    
+    from felpy.utils.opt_utils import ekev2wav
+
+    print(sys.argv)
+
+    with h5.File(sys.argv[1], "r") as hf:
+        ii = hf.get("data")[()].T
+
     z = float(sys.argv[2])
     wav = ekev2wav(float(sys.argv[3]))
     delta = float(sys.argv[4])
@@ -96,6 +87,5 @@ if __name__ == "__main__":
 
     paganin_phase = paganin_algorithm(ii, z, wav, delta, beta)
 
- 
-    with h5.File(sys.argv[6],'w') as hf:
-        hf.create_dataset(name='data', data=paganin_phase)
+    with h5.File(sys.argv[6], "w") as hf:
+        hf.create_dataset(name="data", data=paganin_phase)
