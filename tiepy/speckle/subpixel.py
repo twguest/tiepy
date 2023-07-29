@@ -454,11 +454,20 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
     :return: dict
         A dictionary containing the processed results for each subset image.
         The dictionary includes the following keys:
-            - 'subset_centers': A list of tuples (row_center, col_center) representing the centers of the subset images.
-            - 'subpixel_shifts': A list of tuples (subpixel_shift_x, subpixel_shift_y) indicating the subpixel shifts
-                                between the reference image and each subset image.
-            - 'shifts': A list of tuples (shift_x, shift_y) indicating the shifts between the reference image and
-                        each subset image, computed as the peak positions in the correlation maps.
+            - 'coords_x': numpy.ndarray
+                A 1D array containing the horizontal (x) coordinates of the centers of the subset images.
+            - 'coords_y': numpy.ndarray
+                A 1D array containing the vertical (y) coordinates of the centers of the subset images.
+            - 'shifts_x': numpy.ndarray
+                A 1D array containing the horizontal (x) shifts between the reference image and each subset image,
+                computed as the peak positions in the correlation maps.
+            - 'shifts_y': numpy.ndarray
+                A 1D array containing the vertical (y) shifts between the reference image and each subset image,
+                computed as the peak positions in the correlation maps.
+            - 'subpixel_shifts_x': numpy.ndarray
+                A 1D array containing the horizontal (x) subpixel shifts between the reference image and each subset image.
+            - 'subpixel_shifts_y': numpy.ndarray
+                A 1D array containing the vertical (y) subpixel shifts between the reference image and each subset image.
 
     :Example:
         >>> import numpy as np
@@ -480,35 +489,28 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
         displaying the subset image, reference image, and magnitude of the correlation map.
         The function returns a dictionary containing the processed results for each subset image,
         including the subset centers, subpixel shifts, and shifts computed as peak positions in the correlation maps.
-        The results can be used for further analysis or visualization.
+        The results are returned as numpy arrays and can be used for further analysis or visualization.
 
     :Note:
         - The 'reference_image' and 'sample_image' should be 2D numpy arrays with proper dimensions.
         - The 'window_size' and 'step_size' should be positive integers.
         - The 'padding' should be a non-negative integer.
     """
-    subset, centers = get_subsets(sample_image, window_size = window_size, step_size = step_size, padding = padding)
-    
-    shift_results = process_subset_images(reference_image,
-                                          subset_images = subset,
-                                          subset_centers = centers,
-                                          plot=plot)
-    
+    subset, centers = get_subsets(sample_image, window_size=window_size, step_size=step_size, padding=padding)
+    shift_results = process_subset_images(reference_image, subset_images=subset, subset_centers=centers, plot=plot)
+
     results = {}
     
+    # Convert list of tuples to NumPy arrays for better structure
+    coords_x, coords_y, shifts_x, shifts_y = construct_arrays(shift_results['subset_centers'], shift_results['shifts'])
+    _, _, subpixel_shifts_x, subpixel_shifts_y = construct_arrays(shift_results['subset_centers'], shift_results['subpixel_shifts'])
     
-    coords_x, coords_y, sx, sy = construct_arrays(shift_results['subset_centers'], shift_results['shifts'])
-    _, _, ssx, ssy = construct_arrays(shift_results['subset_centers'], shift_results['subpixel_shifts'])
-
-    
-    results['coords_x'] = coords_x
-    results['coords_y'] = coords_y
-    
-    results['shifts_x'] = sx
-    results['shifts_y'] = sy
-
-    results['subpixel_shifts_x'] = ssx
-    results['subpixel_shifts_y'] = ssy
-    
+    # Store NumPy arrays in the dictionary with descriptive keys
+    results['coords_x'] = coords_x  # Horizontal (x) coordinates of the centers of the subset images.
+    results['coords_y'] = coords_y  # Vertical (y) coordinates of the centers of the subset images.
+    results['shifts_x'] = shifts_x  # Horizontal (x) shifts between the reference image and each subset image.
+    results['shifts_y'] = shifts_y  # Vertical (y) shifts between the reference image and each subset image.
+    results['subpixel_shifts_x'] = subpixel_shifts_x  # Horizontal (x) subpixel shifts between the reference image and each subset image.
+    results['subpixel_shifts_y'] = subpixel_shifts_y  # Vertical (y) subpixel shifts between the reference image and each subset image.
     
     return results
