@@ -45,7 +45,8 @@ import scipy.signal
 import matplotlib.pyplot as plt
 import cv2 as cv
 
-from tiepy.speckle.utils import get_subsets, reshape_to_2d, construct_arrays
+from tiepy.speckle.utils import get_subsets, reshape_to_2d, construct_arrays, generate_gaussian_mask
+
 from tiepy.speckle.phase_retrieval import kottler
 from tqdm import tqdm
 
@@ -71,7 +72,7 @@ def normalize_image(image):
     # Subtract the mean and divide by standard deviation
     return (image - np.mean(image)) / np.std(image)
 
-def match_template(reference_image, subset_images, method=3):
+def match_template(reference_image, subset_images, subset_centers, method = 3):
     """
     Perform template matching using OpenCV's cv2.matchTemplate function on multiple subset images.
 
@@ -102,13 +103,28 @@ def match_template(reference_image, subset_images, method=3):
     
     max_corr_position = []
     
-    for subset_image in subset_images:
-            
-        res = cv.matchTemplate(templ=reference_image, image=subset_image, method=method)
-        _, _, _, max_loc = cv.minMaxLoc(res)
+    w = subset_images[0].shape[0]
+    
+    for itr, (subset_image, subset_center) in enumerate(zip(subset_images,subset_centers)):
+
+        mask = 1        
+        # mask = generate_gaussian_mask(*reference_image.T.shape,
+        #                               subset_center[0],
+        #                               subset_center[1],
+        #                               1,
+        #                               10)
+ 
+        res = cv.matchTemplate(templ=subset_image, image=reference_image*mask, method=method)
+        _, _, min_loc, max_loc = cv.minMaxLoc(res)
+        # plt.imshow(reference_image*mask)
+        # plt.scatter(*max_loc)
+        # plt.show()
+        # print(max_loc)
+        # print(subset_center)
+ 
         max_corr_position.append(max_loc)
         
-    return max_loc
+    return max_corr_position
 
 
 def calculate_correlation(reference_image, subset_images, subset_centers):
@@ -400,7 +416,8 @@ def process_subset_images(
         # Calculate shifts, centers, and correlation maps with respect to the reference image
         correlations = method(reference_image, subset_images, subset_centers)
     elif method == match_template:
-        max_corr_position = method(reference_image, subset_images, method = 3)
+        max_corr_position = method(reference_image, subset_images, subset_centers, method = 3)
+        correlations = max_corr_position ### quick fix
         
     # Plot individual graphs for each subset image (if plot_graphs is True)
 
@@ -417,8 +434,9 @@ def process_subset_images(
             corr_peaks = (max_corr_position[0] + w // 2 - center[0], max_corr_position[1] + w // 2 - center[1])
             
         elif method == match_template:
-            corr_peaks = (max_corr_position[i][0] + w // 2 - center[0], max_corr_position[i][1] + w // 2 - center[1])
-        
+            #corr_peaks = (max_corr_position[i][0],max_corr_position[i][1])
+            corr_peaks = (max_corr_position[i][1] - center[0] + w//2, max_corr_position[i][0] - center[1] + + w//2)
+            
         # Plot individual graphs for each subset image (if plot is True)
         if plot:
             
@@ -594,9 +612,11 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
     coords_x, coords_y, shifts_x, shifts_y = construct_arrays(
         shift_results["subset_centers"], shift_results["shifts"]
     )
-    _, _, subpixel_shifts_x, subpixel_shifts_y = construct_arrays(
-        shift_results["subset_centers"], shift_results["subpixel_shifts"]
-    )
+    
+    if subpixel:
+        _, _, subpixel_shifts_x, subpixel_shifts_y = construct_arrays(
+            shift_results["subset_centers"], shift_results["subpixel_shifts"]
+        )
 
     # Store NumPy arrays in the dictionary with descriptive keys
     results["coords_x"] = coords_x  # Horizontal (x) coordinates of the centers of the subset images.

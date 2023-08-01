@@ -180,4 +180,6 @@ def generate_gaussian_mask(nx, ny, x0, y0, sigma, w):
     mask = np.exp(-dist_squared / (2 * sigma**2))
     mask[dist_squared <= w**2] = 1
     mask /= np.max(mask)
+    
+    mask = mask.astype('float32')
     return mask
