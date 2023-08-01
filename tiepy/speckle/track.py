@@ -400,7 +400,7 @@ def process_subset_images(
         # Calculate shifts, centers, and correlation maps with respect to the reference image
         correlations = method(reference_image, subset_images, subset_centers)
     elif method == match_template:
-        max_corr_position = method(reference_image, subset_images, method = '3')
+        max_corr_position = method(reference_image, subset_images, method = 3)
         
     # Plot individual graphs for each subset image (if plot_graphs is True)
 
