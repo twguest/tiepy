@@ -4,7 +4,7 @@
   <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usage &mdash; tiepy 0.post18.dev0+gc31cc9f documentation</title>
+  <title>Usage &mdash; tiepy 0.post19.dev0+g4bac0d3 documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
@@ -37,7 +37,7 @@
             tiepy
           </a>
               <div class="version">
-                0.post18.dev0+gc31cc9f
+                0.post19.dev0+g4bac0d3
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
@@ -69,7 +69,16 @@
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#io">IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#io">IO</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.io.print_h5_keys"><code class="docutils literal notranslate"><span class="pre">print_h5_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.io.load_tiff_as_npy"><code class="docutils literal notranslate"><span class="pre">load_tiff_as_npy()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.io.get_keys"><code class="docutils literal notranslate"><span class="pre">get_keys()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.io.create_virtual_h5"><code class="docutils literal notranslate"><span class="pre">create_virtual_h5()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.io.save_dict_to_h5"><code class="docutils literal notranslate"><span class="pre">save_dict_to_h5()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.io.load_dict_from_h5"><code class="docutils literal notranslate"><span class="pre">load_dict_from_h5()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.io.load_key_from_virtual_h5"><code class="docutils literal notranslate"><span class="pre">load_key_from_virtual_h5()</span></code></a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="#test-samples">Test Samples</a><ul>
 <li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.objects.generate_speckle_pattern"><code class="docutils literal notranslate"><span class="pre">generate_speckle_pattern()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.objects.generate_gaussian_2d"><code class="docutils literal notranslate"><span class="pre">generate_gaussian_2d()</span></code></a></li>
@@ -501,13 +510,146 @@ Journal of Microscopy, vol. 206, no. 1, pp. 33-40, 2002.</p>
 <h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this heading">¶</a></h2>
 <section id="io">
 <h3>IO<a class="headerlink" href="#io" title="Permalink to this heading">¶</a></h3>
-<p>tiepy.speckle.io.print_h5_keys
-tiepy.speckle.io.load_tiff_as_npy
-tiepy.speckle.io.get_keys
-tiepy.speckle.io.create_virtual_h5
-tiepy.speckle.io.save_dict_to_h5
-tiepy.speckle.io.load_dict_from_h5
-tiepy.speckle.io.load_key_from_virtual_h5</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.io.print_h5_keys">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.io.</span></span><span class="sig-name descname"><span class="pre">print_h5_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/io.html#print_h5_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.io.print_h5_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print the keys present in an HDF5 file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – str
+The name of the HDF5 file from which keys will be retrieved and printed.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">print_h5_keys</span><span class="p">(</span><span class="s1">&#39;data.h5&#39;</span><span class="p">)</span>
+<span class="go">Keys in the HDF5 file:</span>
+<span class="go">dataset1</span>
+<span class="go">dataset2</span>
+<span class="go">dataset3</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.io.load_tiff_as_npy">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.io.</span></span><span class="sig-name descname"><span class="pre">load_tiff_as_npy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/io.html#load_tiff_as_npy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.io.load_tiff_as_npy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a TIFF file as a NumPy array.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><p>filename (str): The path to the TIFF file.</p>
+</dd>
+<dt>Returns:</dt><dd><p>numpy.ndarray: The loaded image as a NumPy array.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.io.get_keys">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.io.</span></span><span class="sig-name descname"><span class="pre">get_keys</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/io.html#get_keys"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.io.get_keys" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the keys present in an HDF5 file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – str
+The name of the HDF5 file from which keys will be retrieved.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list
+A list containing the keys present in the HDF5 file.</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">keys</span> <span class="o">=</span> <span class="n">get_keys</span><span class="p">(</span><span class="s1">&#39;data.h5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">keys</span><span class="p">)</span>
+<span class="go">[&#39;dataset1&#39;, &#39;dataset2&#39;, &#39;dataset3&#39;]</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.io.create_virtual_h5">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.io.</span></span><span class="sig-name descname"><span class="pre">create_virtual_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/io.html#create_virtual_h5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.io.create_virtual_h5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a virtual HDF5 file from multiple individual HDF5 files in a directory.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>directory</strong> – str
+The directory containing the HDF5 files to be combined.</p></li>
+<li><p><strong>output_filename</strong> – str
+The name of the virtual HDF5 file to be created.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">create_virtual_h5</span><span class="p">(</span><span class="s1">&#39;data_directory&#39;</span><span class="p">,</span> <span class="s1">&#39;virtual_data.h5&#39;</span><span class="p">)</span>
+<span class="go">Virtual dataset created in virtual_data.h5</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.io.save_dict_to_h5">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.io.</span></span><span class="sig-name descname"><span class="pre">save_dict_to_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dictionary</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/io.html#save_dict_to_h5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.io.save_dict_to_h5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Save a dictionary to an HDF5 file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dictionary</strong> – dict
+The dictionary containing the data to be saved. The keys represent the dataset names, and the values represent
+the data to be stored.</p></li>
+<li><p><strong>filename</strong> – str
+The name of the HDF5 file where the dictionary will be saved. If the file already exists, it will be overwritten.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>None</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">data</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;dataset1&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">],</span> <span class="s1">&#39;dataset2&#39;</span><span class="p">:</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">,</span> <span class="mi">30</span><span class="p">),</span> <span class="s1">&#39;dataset3&#39;</span><span class="p">:</span> <span class="mi">42</span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">save_dict_to_h5</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="s1">&#39;data.h5&#39;</span><span class="p">)</span>
+<span class="go"># Creates an HDF5 file &#39;data.h5&#39; containing three datasets: &#39;dataset1&#39;, &#39;dataset2&#39;, and &#39;dataset3&#39;.</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.io.load_dict_from_h5">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.io.</span></span><span class="sig-name descname"><span class="pre">load_dict_from_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/io.html#load_dict_from_h5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.io.load_dict_from_h5" title="Permalink to this definition">¶</a></dt>
+<dd><p>Load a dictionary from an HDF5 file.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>filename</strong> – str
+The name of the HDF5 file from which the dictionary will be loaded.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>dict
+A dictionary containing the data loaded from the HDF5 file. The keys represent the dataset names, and the values
+represent the corresponding data arrays.</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">loaded_data</span> <span class="o">=</span> <span class="n">load_dict_from_h5</span><span class="p">(</span><span class="s1">&#39;data.h5&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">loaded_data</span><span class="p">)</span>
+<span class="go">{&#39;dataset1&#39;: array([1, 2, 3]), &#39;dataset2&#39;: array([10, 20, 30]), &#39;dataset3&#39;: array(42)}</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.io.load_key_from_virtual_h5">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.io.</span></span><span class="sig-name descname"><span class="pre">load_key_from_virtual_h5</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">virtual_file</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/io.html#load_key_from_virtual_h5"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.io.load_key_from_virtual_h5" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
 </section>
 <section id="test-samples">
 <h3>Test Samples<a class="headerlink" href="#test-samples" title="Permalink to this heading">¶</a></h3>

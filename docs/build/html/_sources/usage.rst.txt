@@ -40,13 +40,13 @@ Utilities
 
 IO
 --
-tiepy.speckle.io.print_h5_keys
-tiepy.speckle.io.load_tiff_as_npy
-tiepy.speckle.io.get_keys
-tiepy.speckle.io.create_virtual_h5
-tiepy.speckle.io.save_dict_to_h5
-tiepy.speckle.io.load_dict_from_h5
-tiepy.speckle.io.load_key_from_virtual_h5
+.. autofunction:: tiepy.speckle.io.print_h5_keys
+.. autofunction:: tiepy.speckle.io.load_tiff_as_npy
+.. autofunction:: tiepy.speckle.io.get_keys
+.. autofunction:: tiepy.speckle.io.create_virtual_h5
+.. autofunction:: tiepy.speckle.io.save_dict_to_h5
+.. autofunction:: tiepy.speckle.io.load_dict_from_h5
+.. autofunction:: tiepy.speckle.io.load_key_from_virtual_h5
 
 
 Test Samples
