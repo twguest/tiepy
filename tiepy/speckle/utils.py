@@ -171,3 +171,13 @@ def construct_arrays(coordinates, measurements):
     array_m2 = np.reshape([meas[0] for meas in measurements], (n, m))
 
     return array_x.T, array_y.T, array_m1, array_m2
+
+def generate_gaussian_mask(nx, ny, x0, y0, sigma, w):
+    x = np.arange(nx)
+    y = np.arange(ny)
+    X, Y = np.meshgrid(x, y)
+    dist_squared = (X - x0) ** 2 + (Y - y0) ** 2
+    mask = np.exp(-dist_squared / (2 * sigma**2))
+    mask[dist_squared <= w**2] = 1
+    mask /= np.max(mask)
+    return mask
