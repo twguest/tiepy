@@ -579,8 +579,11 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
     
     assert type(extra_metadata) == dict, "Metadata should be in dictionary format"
     
+    if method == match_template:
+        assert subpixel is False, "subpixel resolution not compatible with method 'match_template' "
+        
     subset, centers = get_subsets(sample_image, window_size=window_size, step_size=step_size, padding=padding)
-    shift_results = process_subset_images(reference_image, subset_images=subset, subset_centers=centers, plot=plot)
+    shift_results = process_subset_images(reference_image, subset_images=subset, subpixel = subpixel, method = method, subset_centers=centers, plot=plot)
 
     results = {}
     
