@@ -43,6 +43,7 @@ Note:
 import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
+import cv2 as cv
 
 from tiepy.speckle.utils import get_subsets, reshape_to_2d, construct_arrays
 from tiepy.speckle.phase_retrieval import kottler
@@ -69,6 +70,49 @@ def normalize_image(image):
     """
     # Subtract the mean and divide by standard deviation
     return (image - np.mean(image)) / np.std(image)
+
+def match_template(reference_image, subset_images, method=3):
+    """
+    Perform template matching using OpenCV's cv2.matchTemplate function on multiple subset images.
+
+    :param reference_image: numpy.ndarray
+        The reference image to be matched against the subset images. It should be a 2D array (grayscale image).
+
+    :param subset_images: list of numpy.ndarray
+        A list containing the subset images to which the reference template will be matched.
+        Each subset image should be a 2D array (grayscale image).
+
+    :param method: int, optional
+        The method to be used for matching. Refer to cv2.matchTemplate documentation for method options.
+        Defaults to 3 (cv2.TM_CCOEFF_NORMED).
+
+    :return: tuple
+        A tuple containing:
+            - numpy.ndarray:
+                The result of template matching as a 2D array of floating-point values for the last subset image processed.
+                This array represents the similarity between the reference template and the subset image at each location.
+            - list of tuple:
+                A list containing the locations (x, y) of the best match in each subset image.
+                Each location corresponds to the top-left corner of the matched region.
+
+    :raises:
+        AssertionError: If the 'method' parameter is not of integer type or outside the range [0, 5].
+
+    :Note:
+        - The 'reference_image' and each 'subset_image' should be grayscale images of the same dtype and have proper dimensions.
+        - The output list of tuples (max_corr_position) represents the locations of the best matches in the subset images.
+    """
+    assert isinstance(method, int) and 0 <= method <= 5, "method should be an integer index in the range [0, 5]"
+    
+    max_corr_position = []
+    
+    for subset_image in subset_images:
+            
+        res = cv.matchTemplate(templ=reference_image, image=subset_image, method=method)
+        _, _, _, max_loc = cv.minMaxLoc(res)
+        max_corr_position.append(max_loc)
+        
+    return res, max_loc
 
 
 def calculate_correlation(reference_image, subset_images, subset_centers):
@@ -288,7 +332,7 @@ def fit_gaussian_and_find_peak(correlation_map, window_shape, subset_center, plo
 
 
 def process_subset_images(
-    reference_image, subset_images, subset_centers, plot=False, method=calculate_normalized_correlation
+    reference_image, subset_images, subset_centers, plot=False, method=calculate_normalized_correlation, subpixel = True,
 ):
     """
     Process a set images (nominally subsets of a larger image) by calculating shifts and correlation maps with respect to a reference image.
@@ -336,23 +380,37 @@ def process_subset_images(
     # Initialize a dictionary to store the results for each subset image
     results = {"subset_centers": [], "subpixel_shifts": [], "shifts": []}
 
-    # Calculate shifts, centers, and correlation maps with respect to the reference image
-    correlations = method(reference_image, subset_images, subset_centers)
-
+    if method == match_template:
+        assert subpixel is False, "subpixel resolution not compatible with method 'match_template' "
+        
+    if method in [calculate_normalized_correlation, calculate_correlation]:
+        # Calculate shifts, centers, and correlation maps with respect to the reference image
+        correlations = method(reference_image, subset_images, subset_centers)
+    elif method == match_template:
+        max_corr_position = method(reference_image, subset_images, method = '3')
+        
     # Plot individual graphs for each subset image (if plot_graphs is True)
 
     for i, (subset_image, center, correlation) in enumerate(
         zip(subset_images, subset_centers, correlations), start=0
     ):
+        
         w = subset_image.shape[0]
-
-        correlation_magnitude = np.abs(correlation)
-        max_corr_position = np.unravel_index(np.argmax(correlation_magnitude), correlation_magnitude.shape)
-
-        corr_peaks = (max_corr_position[0] + w // 2 - center[0], max_corr_position[1] + w // 2 - center[1])
-
+        
+        if method in [calculate_normalized_correlation, calculate_correlation]:
+            correlation_magnitude = np.abs(correlation)
+            max_corr_position = np.unravel_index(np.argmax(correlation_magnitude), correlation_magnitude.shape)
+        
+            corr_peaks = (max_corr_position[0] + w // 2 - center[0], max_corr_position[1] + w // 2 - center[1])
+            
+        elif method == match_template:
+            corr_peaks = (max_corr_position[i][0] + w // 2 - center[0], max_corr_position[i][1] + w // 2 - center[1])
+        
         # Plot individual graphs for each subset image (if plot is True)
         if plot:
+            
+            assert method != match_template, "plotting not supported for method = match_template"
+
             plt.figure(figsize=(15, 5))
 
             # Plot the subset image
@@ -408,21 +466,24 @@ def process_subset_images(
             plt.tight_layout()
             plt.show()
 
-        # Fit a quadratic function to the correlation map and find its peak within a specified window
-        peak_x, peak_y = fit_gaussian_and_find_peak(
-            correlation_magnitude, subset_image.shape, subset_centers[i], plot=plot
-        )
-        peaks = (peak_x + corr_peaks[0], peak_y + corr_peaks[1])
+        
+        if subpixel:
+            
+            # Fit a quadratic function to the correlation map and find its peak within a specified window
+            peak_x, peak_y = fit_gaussian_and_find_peak(
+                correlation_magnitude, subset_image.shape, subset_centers[i], plot=plot
+            )
+            peaks = (peak_x + corr_peaks[0], peak_y + corr_peaks[1])
+            results["subpixel_shifts"].append(peaks)
 
         # Append the values to the corresponding lists in the results dictionary
         results["subset_centers"].append((center[0], center[1]))
-        results["subpixel_shifts"].append(peaks)
         results["shifts"].append(corr_peaks)
 
     return results
 
 
-def process_single_image(reference_image, sample_image, window_size, step_size, padding=0, plot=False, extra_metadata = {}):
+def process_single_image(reference_image, sample_image, window_size, step_size, padding=0, method=calculate_normalized_correlation, subpixel = False, plot=False, extra_metadata = {}):
     """
     Process a single image by extracting subsets, computing correlation, and subpixel shifts.
 
@@ -514,12 +575,15 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
     results["coords_y"] = coords_y  # Vertical (y) coordinates of the centers of the subset images.
     results["shifts_x"] = shifts_x  # Horizontal (x) shifts between the reference image and each subset image.
     results["shifts_y"] = shifts_y  # Vertical (y) shifts between the reference image and each subset image.
-    results[
-        "subpixel_shifts_x"
-    ] = subpixel_shifts_x  # Horizontal (x) subpixel shifts between the reference image and each subset image.
-    results[
-        "subpixel_shifts_y"
-    ] = subpixel_shifts_y  # Vertical (y) subpixel shifts between the reference image and each subset image.
+    
+    if subpixel == True:
+            
+        results[
+            "subpixel_shifts_x"
+        ] = subpixel_shifts_x  # Horizontal (x) subpixel shifts between the reference image and each subset image.
+        results[
+            "subpixel_shifts_y"
+        ] = subpixel_shifts_y  # Vertical (y) subpixel shifts between the reference image and each subset image.
     
     
     return results
