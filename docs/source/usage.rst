@@ -6,7 +6,7 @@ Start by importing tiepy.
 
 .. code-block:: python
 
-    import tiepy-xfel
+    import tiepy
     
 ===
 API
