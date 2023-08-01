@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tiepy.speckle.objects &mdash; tiepy 0.post18.dev0+gc31cc9f documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tiepy
+          </a>
+              <div class="version">
+                0.post18.dev0+gc31cc9f
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#api">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tiepy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">tiepy.speckle.objects</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tiepy.speckle.objects</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Module for generating various intensity distributions.</span>
+
+<span class="sd">This module provides functions to generate various intensity distributions, which can be used for</span>
+<span class="sd">simulation and testing purposes. The functions within this module offer a variety of intensity patterns</span>
+<span class="sd">that can be applied to 2D arrays to create different synthetic images.</span>
+
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">scipy.ndimage</span> <span class="kn">import</span> <span class="n">gaussian_filter</span>
+
+
+<div class="viewcode-block" id="generate_speckle_pattern"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.objects.generate_speckle_pattern">[docs]</a><span class="k">def</span> <span class="nf">generate_speckle_pattern</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">intensity_range</span><span class="p">,</span> <span class="n">speckle_size</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a speckle pattern (gaussian filtered random noise) array.</span>
+
+<span class="sd">    :param shape: A tuple (rows, columns) specifying the shape of the array. [tuple]</span>
+<span class="sd">    :param intensity_range: A tuple (min_intensity, max_intensity) specifying the range of intensity values. [tuple]</span>
+<span class="sd">    :param speckle_size: width of gaussian filter</span>
+
+<span class="sd">    :return: A 2D numpy array containing the speckle pattern. [numpy.ndarray]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">min_intensity</span><span class="p">,</span> <span class="n">max_intensity</span> <span class="o">=</span> <span class="n">intensity_range</span>
+    <span class="n">speckle</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">uniform</span><span class="p">(</span><span class="n">min_intensity</span><span class="p">,</span> <span class="n">max_intensity</span><span class="p">,</span> <span class="n">shape</span><span class="p">)</span>
+    <span class="n">speckle</span> <span class="o">=</span> <span class="n">gaussian_filter</span><span class="p">(</span><span class="n">speckle</span><span class="p">,</span> <span class="n">speckle_size</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">speckle</span></div>
+
+
+<div class="viewcode-block" id="generate_gaussian_2d"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.objects.generate_gaussian_2d">[docs]</a><span class="k">def</span> <span class="nf">generate_gaussian_2d</span><span class="p">(</span><span class="n">shape</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">sigma</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a 2D Gaussian array.</span>
+
+<span class="sd">    :param shape: A tuple (rows, columns) specifying the shape of the array. [tuple]</span>
+<span class="sd">    :param center: A tuple (row_center, col_center) specifying the center of the Gaussian. [tuple]</span>
+<span class="sd">    :param sigma: A float representing the standard deviation of the Gaussian. [float]</span>
+
+<span class="sd">    :return: A 2D numpy array containing the Gaussian. [numpy.ndarray]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">rows</span><span class="p">,</span> <span class="n">cols</span> <span class="o">=</span> <span class="n">shape</span>
+    <span class="n">row_center</span><span class="p">,</span> <span class="n">col_center</span> <span class="o">=</span> <span class="n">center</span>
+    <span class="n">y</span><span class="p">,</span> <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">ogrid</span><span class="p">[:</span><span class="n">rows</span><span class="p">,</span> <span class="p">:</span><span class="n">cols</span><span class="p">]</span>
+    <span class="n">gauss</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">col_center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">row_center</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma</span><span class="o">**</span><span class="mi">2</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">gauss</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Trey Guest.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

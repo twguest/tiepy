@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tiepy.speckle.track &mdash; tiepy 0.post18.dev0+gc31cc9f documentation</title>
+      <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/plot_directive.css" type="text/css" />
+      <link rel="stylesheet" href="../../../_static/copybutton.css" type="text/css" />
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/sphinx_highlight.js"></script>
+        <script src="../../../_static/clipboard.min.js"></script>
+        <script src="../../../_static/copybutton.js"></script>
+    <script src="../../../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../../index.html" class="icon icon-home">
+            tiepy
+          </a>
+              <div class="version">
+                0.post18.dev0+gc31cc9f
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../usage.html#api">API</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../release-history.html">Release History</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../min_versions.html">Minimum Version of Python and NumPy</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">tiepy</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../../index.html">Module code</a></li>
+      <li class="breadcrumb-item active">tiepy.speckle.track</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Source code for tiepy.speckle.track</h1><div class="highlight"><pre>
+<span></span><span class="c1"># -*- coding: utf-8 -*-</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This Python file contains several utility functions for image processing and correlation analysis.</span>
+
+<span class="sd">Functions:</span>
+<span class="sd">1. reshape_to_2d(data)</span>
+<span class="sd">   Utility: Reshapes a 1D data array into a 2D array.</span>
+<span class="sd">   </span>
+<span class="sd">2. normalize_image(image)</span>
+<span class="sd">   Utility: Normalizes an image by subtracting the mean and dividing by the standard deviation.</span>
+
+<span class="sd">3. calculate_correlation(reference_image, subset_images, subset_centers)</span>
+<span class="sd">   Utility: Calculates correlation maps between a reference image and a list of subset images.</span>
+<span class="sd">            The correlation maps represent the similarity between the reference image and each subset image.</span>
+
+<span class="sd">4. calculate_normalized_correlation(reference_image, subset_images, normalize=True)</span>
+<span class="sd">   Utility: Calculates normalized correlation maps between a reference image and a list of subset images.</span>
+<span class="sd">            The correlation maps represent the similarity between the reference image and each subset image</span>
+<span class="sd">            after normalization.</span>
+
+<span class="sd">5. fit_quadratic_and_find_peak(correlation_map, window_shape, subset_center, plot=False)</span>
+<span class="sd">   Utility: Fits a quadratic function to a window of the correlation map and finds the peak coordinates.</span>
+<span class="sd">            This function is used for subpixel peak detection.</span>
+
+<span class="sd">6. process_subset_images(reference_image, subset_images, subset_centers, plot=False, method=calculate_normalized_correlation)</span>
+<span class="sd">   Utility: Processes a set of images (subsets) by calculating shifts and correlation maps with respect to a reference image.</span>
+<span class="sd">            The function returns the results of the correlation analysis for each subset image.</span>
+
+<span class="sd">7. process_single_image(reference_image, sample_image, window_size, step_size, padding=0, plot=False)</span>
+<span class="sd">   Main Function: Process a single image by extracting subsets, computing correlation, and subpixel shifts.</span>
+
+<span class="sd">Note:</span>
+<span class="sd">- These functions are designed for grayscale images represented as 2D numpy arrays.</span>
+<span class="sd">- The &#39;plot&#39; parameter allows for optional visualization of the correlation analysis results.</span>
+<span class="sd">- The &#39;method&#39; parameter in &#39;process_subset_images&#39; can be used to specify a custom correlation function.</span>
+<span class="sd">- The script uses the NumPy, SciPy, and Matplotlib libraries for image processing and visualization.</span>
+<span class="sd">- The main function &#39;process_single_image&#39; combines various utility functions to perform the image processing and analysis.</span>
+
+<span class="sd">@author: twguest (trey.guest@xfel.eu)</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">scipy.signal</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">cv2</span> <span class="k">as</span> <span class="nn">cv</span>
+
+<span class="kn">from</span> <span class="nn">tiepy.speckle.utils</span> <span class="kn">import</span> <span class="n">get_subsets</span><span class="p">,</span> <span class="n">reshape_to_2d</span><span class="p">,</span> <span class="n">construct_arrays</span>
+<span class="kn">from</span> <span class="nn">tiepy.speckle.phase_retrieval</span> <span class="kn">import</span> <span class="n">kottler</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">mpl_toolkits.axes_grid1</span> <span class="kn">import</span> <span class="n">make_axes_locatable</span>
+
+
+<span class="k">def</span> <span class="nf">normalize_image</span><span class="p">(</span><span class="n">image</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Normalize an image by subtracting the mean and dividing by the standard deviation.</span>
+
+<span class="sd">    This function normalizes an input image by subtracting its mean value and dividing by its standard deviation.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        image: The input image to be normalized. [numpy.ndarray]</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        numpy.ndarray: A 2D numpy array representing the normalized image.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; image = np.array([[10, 20, 30], [40, 50, 60], [70, 80, 90]])</span>
+<span class="sd">        &gt;&gt;&gt; normalized_image = normalize_image(image)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Subtract the mean and divide by standard deviation</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">image</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">image</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+
+<div class="viewcode-block" id="match_template"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.track.match_template">[docs]</a><span class="k">def</span> <span class="nf">match_template</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_images</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="mi">3</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Perform template matching using OpenCV&#39;s cv2.matchTemplate function on multiple subset images.</span>
+
+<span class="sd">    :param reference_image: numpy.ndarray</span>
+<span class="sd">        The reference image to be matched against the subset images. It should be a 2D array (grayscale image).</span>
+
+<span class="sd">    :param subset_images: list of numpy.ndarray</span>
+<span class="sd">        A list containing the subset images to which the reference template will be matched.</span>
+<span class="sd">        Each subset image should be a 2D array (grayscale image).</span>
+
+<span class="sd">    :param method: int, optional</span>
+<span class="sd">        The method to be used for matching. Refer to cv2.matchTemplate documentation for method options.</span>
+<span class="sd">        Defaults to 3 (cv2.TM_CCOEFF_NORMED).</span>
+
+<span class="sd">    :return: list of tuple</span>
+<span class="sd">        A list containing the locations (x, y) of the best match in each subset image.</span>
+<span class="sd">        Each location corresponds to the top-left corner of the matched region.</span>
+
+<span class="sd">    :raises AssertionError:</span>
+<span class="sd">        - If the &#39;method&#39; parameter is not of integer type or outside the range [0, 5].</span>
+
+<span class="sd">    :Note:</span>
+<span class="sd">        - The &#39;reference_image&#39; and each &#39;subset_image&#39; should be grayscale images of the same dtype and have proper dimensions.</span>
+<span class="sd">        - The &#39;method&#39; parameter determines the matching method to be used. It should be an integer index in the range [0, 5].</span>
+<span class="sd">        - The output list of tuples represents the locations of the best matches in the subset images.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">assert</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">method</span><span class="p">,</span> <span class="nb">int</span><span class="p">)</span> <span class="ow">and</span> <span class="mi">0</span> <span class="o">&lt;=</span> <span class="n">method</span> <span class="o">&lt;=</span> <span class="mi">5</span><span class="p">,</span> <span class="s2">&quot;method should be an integer index in the range [0, 5]&quot;</span>
+    
+    <span class="n">max_corr_position</span> <span class="o">=</span> <span class="p">[]</span>
+    
+    <span class="k">for</span> <span class="n">subset_image</span> <span class="ow">in</span> <span class="n">subset_images</span><span class="p">:</span>
+            
+        <span class="n">res</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">matchTemplate</span><span class="p">(</span><span class="n">templ</span><span class="o">=</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">image</span><span class="o">=</span><span class="n">subset_image</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">method</span><span class="p">)</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">max_loc</span> <span class="o">=</span> <span class="n">cv</span><span class="o">.</span><span class="n">minMaxLoc</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+        <span class="n">max_corr_position</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">max_loc</span><span class="p">)</span>
+        
+    <span class="k">return</span> <span class="n">max_loc</span></div>
+
+
+<div class="viewcode-block" id="calculate_correlation"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.track.calculate_correlation">[docs]</a><span class="k">def</span> <span class="nf">calculate_correlation</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_images</span><span class="p">,</span> <span class="n">subset_centers</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate correlation maps between a reference image and a list of subset images.</span>
+
+<span class="sd">    This function calculates the correlation maps between a reference image and a list of subset images.</span>
+<span class="sd">    The correlation maps represent the similarity between the reference image and each subset image.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        reference_image: The reference image to which the subset images will be compared. [numpy.ndarray]</span>
+<span class="sd">                         Should be a 2D numpy array representing the grayscale image.</span>
+<span class="sd">        subset_images: A list of subset images to be compared with the reference image. [List[numpy.ndarray]]</span>
+<span class="sd">                       Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.</span>
+<span class="sd">        subset_centers: A list of tuples (row_center, col_center) specifying the centers of the subset images. [List[tuple]]</span>
+<span class="sd">                        Each tuple represents the center position (row, column) of the corresponding subset image.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[numpy.ndarray]: A list of 2D numpy arrays representing the correlation maps for each subset image.</span>
+<span class="sd">                             Each correlation map represents the similarity between the reference image and the respective subset image.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; reference_img = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])</span>
+<span class="sd">        &gt;&gt;&gt; subset_imgs = [np.array([[0.1, 0.2], [0.4, 0.5]]), np.array([[0.8, 0.9], [0.5, 0.6]])]</span>
+<span class="sd">        &gt;&gt;&gt; centers = [(0, 0), (1, 1)]</span>
+<span class="sd">        &gt;&gt;&gt; correlation_maps = calculate_correlation(reference_img, subset_imgs, centers)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate the shift and center coordinates for the reference image</span>
+
+    <span class="n">correlations</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Calculate shifts, centers, and correlation maps for each subset image with respect to the reference image</span>
+    <span class="k">for</span> <span class="n">subset_image</span><span class="p">,</span> <span class="n">subset_center</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">subset_images</span><span class="p">,</span> <span class="n">subset_centers</span><span class="p">):</span>
+        <span class="n">correlation</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">correlate2d</span><span class="p">(</span><span class="n">subset_image</span><span class="p">,</span> <span class="n">reference_image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="s2">&quot;symm&quot;</span><span class="p">)</span>
+        <span class="n">correlations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">correlations</span></div>
+
+
+<div class="viewcode-block" id="calculate_normalized_correlation"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.track.calculate_normalized_correlation">[docs]</a><span class="k">def</span> <span class="nf">calculate_normalized_correlation</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_images</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Calculate normalized correlation maps between a reference image and a list of subset images.</span>
+
+<span class="sd">    This function calculates the normalized correlation maps between a reference image and a list of subset images.</span>
+<span class="sd">    The correlation maps represent the similarity between the reference image and each subset image after normalization.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        reference_image: The reference image to which the subset images will be compared. [numpy.ndarray]</span>
+<span class="sd">                         Should be a 2D numpy array representing the grayscale image.</span>
+<span class="sd">        subset_images: A list of subset images to be compared with the reference image. [List[numpy.ndarray]]</span>
+<span class="sd">                       Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.</span>
+<span class="sd">        normalize: A boolean flag to determine whether to normalize the reference and subset images. [bool, optional]</span>
+<span class="sd">                   If True, the images will be normalized before calculating the correlation. Defaults to True.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        List[numpy.ndarray]: A list of 2D numpy arrays representing the normalized correlation maps for each subset image.</span>
+<span class="sd">                             Each correlation map represents the similarity between the reference image and the respective subset image.</span>
+
+<span class="sd">    Example:</span>
+<span class="sd">        &gt;&gt;&gt; reference_img = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])</span>
+<span class="sd">        &gt;&gt;&gt; subset_imgs = [np.array([[0.1, 0.2], [0.4, 0.5]]), np.array([[0.8, 0.9], [0.5, 0.6]])]</span>
+<span class="sd">        &gt;&gt;&gt; normalized_correlation_maps = calculate_normalized_correlation(reference_img, subset_imgs, normalize=True)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Calculate the shift and center coordinates for the reference image</span>
+
+    <span class="n">correlations</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># Normalize the reference image if needed</span>
+    <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+        <span class="n">reference_image</span> <span class="o">=</span> <span class="n">normalize_image</span><span class="p">(</span><span class="n">reference_image</span><span class="p">)</span>
+
+    <span class="c1"># Calculate shifts, centers, and correlation maps for each subset image with respect to the reference image</span>
+    <span class="k">for</span> <span class="n">subset_image</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">subset_images</span><span class="p">)):</span>
+        <span class="k">if</span> <span class="n">normalize</span><span class="p">:</span>
+            <span class="n">subset_image</span> <span class="o">=</span> <span class="n">normalize_image</span><span class="p">(</span><span class="n">subset_image</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+        <span class="n">correlation</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">signal</span><span class="o">.</span><span class="n">correlate2d</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_image</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;valid&quot;</span><span class="p">,</span> <span class="n">boundary</span><span class="o">=</span><span class="s2">&quot;symm&quot;</span><span class="p">)</span>
+        <span class="n">correlations</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">correlations</span></div>
+
+
+<div class="viewcode-block" id="fit_gaussian_and_find_peak"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.track.fit_gaussian_and_find_peak">[docs]</a><span class="k">def</span> <span class="nf">fit_gaussian_and_find_peak</span><span class="p">(</span><span class="n">correlation_map</span><span class="p">,</span> <span class="n">window_shape</span><span class="p">,</span> <span class="n">subset_center</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Fit a gaussian function to a window of the correlation map and find the peak coordinates.</span>
+
+<span class="sd">    This function fits a quadratic function to a window of the correlation map centered around the</span>
+<span class="sd">    specified subset_center. It then identifies the peak coordinates within the window.</span>
+
+<span class="sd">    Parameters:</span>
+<span class="sd">        correlation_map: The correlation map used for fitting and peak detection. [numpy.ndarray]</span>
+<span class="sd">                         Should be a 2D numpy array representing the correlation map.</span>
+<span class="sd">        window_shape: A tuple (window_width, window_height) specifying the dimensions of the fitting window. [tuple]</span>
+<span class="sd">                      The window is centered around the subset_center and should be smaller than the correlation_map.</span>
+<span class="sd">        subset_center: A tuple (center_x, center_y) specifying the center of the subset for the window. [tuple]</span>
+<span class="sd">                       The subset_center should correspond to the center of the region of interest within the correlation_map.</span>
+<span class="sd">        plot: A boolean flag to determine whether to plot the fitting results. [bool, optional]</span>
+<span class="sd">              If True, the function will generate a plot showing the measured and fitted intensity data.</span>
+<span class="sd">              Defaults to False.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        tuple: A tuple (x_peak, y_peak) representing the peak coordinates in the fitted quadratic function. [tuple]</span>
+<span class="sd">               The coordinates are relative to the corrected center of the subset.</span>
+
+<span class="sd">    Notes:</span>
+<span class="sd">        - The correlation_map should be a 2D numpy array with proper dimensions.</span>
+<span class="sd">        - The window_shape should be smaller than the dimensions of the correlation_map for accurate fitting.</span>
+<span class="sd">        - The subset_center should correspond to the center of the region of interest within the correlation_map.</span>
+<span class="sd">        - The function uses a quadratic fitting method and a Gaussian function for fitting the data.</span>
+<span class="sd">        - The peak coordinates returned are relative to the corrected center of the subset.</span>
+<span class="sd">        - If plot is set to True, the function will generate a 3D plot displaying the measured and fitted intensity data.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">window_width</span><span class="p">,</span> <span class="n">window_height</span> <span class="o">=</span> <span class="n">window_shape</span>
+    <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">correlation_map</span><span class="p">),</span> <span class="n">correlation_map</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+
+    <span class="c1"># Define a window around the corrected center</span>
+    <span class="n">D</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">window</span> <span class="o">=</span> <span class="n">correlation_map</span><span class="p">[</span>
+        <span class="n">cx</span> <span class="o">-</span> <span class="n">window_height</span> <span class="o">//</span> <span class="n">D</span> <span class="p">:</span> <span class="n">cx</span> <span class="o">+</span> <span class="n">window_height</span> <span class="o">//</span> <span class="n">D</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">cy</span> <span class="o">-</span> <span class="n">window_width</span> <span class="o">//</span> <span class="n">D</span> <span class="p">:</span> <span class="n">cy</span> <span class="o">+</span> <span class="n">window_width</span> <span class="o">//</span> <span class="n">D</span> <span class="o">+</span> <span class="mi">1</span>
+    <span class="p">]</span>
+
+    <span class="c1"># Create a grid for fitting (relative to the corrected center)</span>
+    <span class="n">x_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">window_width</span> <span class="o">//</span> <span class="n">D</span><span class="p">,</span> <span class="n">window_width</span> <span class="o">//</span> <span class="n">D</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">y_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="o">-</span><span class="n">window_height</span> <span class="o">//</span> <span class="n">D</span><span class="p">,</span> <span class="n">window_height</span> <span class="o">//</span> <span class="n">D</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">)</span>
+
+    <span class="c1"># Flatten the window and corresponding coordinates</span>
+    <span class="n">z_fit</span> <span class="o">=</span> <span class="n">window</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">x_fit</span> <span class="o">=</span> <span class="n">x_fit</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+    <span class="n">y_fit</span> <span class="o">=</span> <span class="n">y_fit</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+
+    <span class="c1">### Note: This could equally be done with a quadratic fn, maybe work for</span>
+    <span class="c1">###       another day/person.</span>
+
+    <span class="c1"># # Fit a quadratic function to the window data</span>
+    <span class="c1"># def quadratic_func(coords, a, b, c):</span>
+    <span class="c1">#     x, y = coords</span>
+    <span class="c1">#     return a * x**2 + b * x + c * y**2</span>
+
+    <span class="c1"># fit_params, _ = scipy.optimize.curve_fit(quadratic_func, (x_fit, y_fit), z_fit)</span>
+
+    <span class="c1"># # Find the peak coordinates of the fitted quadratic function</span>
+    <span class="c1"># x_peak = -fit_params[1] / (2 * fit_params[0])</span>
+    <span class="c1"># y_peak = -fit_params[2] / (2 * fit_params[0])</span>
+
+    <span class="c1"># Define the 2D Gaussian function</span>
+    <span class="k">def</span> <span class="nf">gaussian_func</span><span class="p">(</span><span class="n">coords</span><span class="p">,</span> <span class="n">A</span><span class="p">,</span> <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">sigma_x</span><span class="p">,</span> <span class="n">sigma_y</span><span class="p">):</span>
+        <span class="n">x</span><span class="p">,</span> <span class="n">y</span> <span class="o">=</span> <span class="n">coords</span>
+        <span class="k">return</span> <span class="n">A</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="p">((</span><span class="n">x</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma_x</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">+</span> <span class="p">(</span><span class="n">y</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">/</span> <span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">sigma_y</span><span class="o">**</span><span class="mi">2</span><span class="p">)))</span>
+
+    <span class="c1"># Initial guess for the parameters (you may want to provide better initial values)</span>
+    <span class="n">initial_guess</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">]</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Use curve_fit to find the optimal parameters that fit the Gaussian function</span>
+        <span class="n">fit_params</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">scipy</span><span class="o">.</span><span class="n">optimize</span><span class="o">.</span><span class="n">curve_fit</span><span class="p">(</span><span class="n">gaussian_func</span><span class="p">,</span> <span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">),</span> <span class="n">z_fit</span><span class="p">,</span> <span class="n">p0</span><span class="o">=</span><span class="n">initial_guess</span><span class="p">)</span>
+
+        <span class="c1"># Find the peak coordinates and peak intensities of the fitted Gaussian function</span>
+        <span class="n">A_fit</span><span class="p">,</span> <span class="n">x0_fit</span><span class="p">,</span> <span class="n">y0_fit</span><span class="p">,</span> <span class="n">sigma_x_fit</span><span class="p">,</span> <span class="n">sigma_y_fit</span> <span class="o">=</span> <span class="n">fit_params</span>
+
+        <span class="c1"># Calculate the peak coordinates</span>
+        <span class="n">x_peak</span> <span class="o">=</span> <span class="n">x0_fit</span>
+        <span class="n">y_peak</span> <span class="o">=</span> <span class="n">y0_fit</span>
+
+        <span class="c1"># Calculate the peak coordinates relative to the corrected center</span>
+        <span class="n">dx</span><span class="p">,</span> <span class="n">dy</span> <span class="o">=</span> <span class="n">subset_center</span>
+
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            <span class="c1"># Generate fitted data and plot it</span>
+            <span class="n">fitted_data</span> <span class="o">=</span> <span class="n">gaussian_func</span><span class="p">((</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">),</span> <span class="o">*</span><span class="n">fit_params</span><span class="p">)</span>
+
+            <span class="c1"># Reshape the variables to 2D</span>
+            <span class="n">variables_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">z_fit</span><span class="p">,</span> <span class="n">fitted_data</span><span class="p">]</span>  <span class="c1"># Add all your variables here</span>
+            <span class="n">variables_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">reshape_to_2d</span><span class="p">(</span><span class="n">variable</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">variable</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">variables_list</span><span class="p">)]</span>
+            <span class="p">[</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">z_fit</span><span class="p">,</span> <span class="n">fitted_data</span><span class="p">]</span> <span class="o">=</span> <span class="n">variables_list</span>
+
+            <span class="c1"># Create a 1x2 figure</span>
+            <span class="n">fig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">16</span><span class="p">,</span> <span class="mi">6</span><span class="p">))</span>
+
+            <span class="c1"># First subplot: Measured Intensity</span>
+            <span class="n">ax1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">121</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+            <span class="n">surf1</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">z_fit</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;bone&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Measured Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">cbar1</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">surf1</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax1</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>  <span class="c1"># Adjust the shrink parameter here</span>
+            <span class="n">cbar1</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">cbar1</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+            <span class="c1"># Second subplot: Fitted Intensity</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">add_subplot</span><span class="p">(</span><span class="mi">122</span><span class="p">,</span> <span class="n">projection</span><span class="o">=</span><span class="s2">&quot;3d&quot;</span><span class="p">)</span>
+            <span class="n">surf2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">plot_surface</span><span class="p">(</span><span class="n">x_fit</span><span class="p">,</span> <span class="n">y_fit</span><span class="p">,</span> <span class="n">fitted_data</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;inferno&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_zlabel</span><span class="p">(</span><span class="s2">&quot;z&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Fitted Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">cbar2</span> <span class="o">=</span> <span class="n">fig</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">surf2</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax2</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">shrink</span><span class="o">=</span><span class="mf">0.6</span><span class="p">)</span>  <span class="c1"># Adjust the shrink parameter here</span>
+            <span class="n">cbar2</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+            <span class="n">cbar2</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+
+            <span class="c1"># Adjust view angles for better visualization</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">azim</span><span class="o">=-</span><span class="mi">40</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">view_init</span><span class="p">(</span><span class="n">elev</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">azim</span><span class="o">=-</span><span class="mi">40</span><span class="p">)</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="s2">&quot;Quadratic Fit and Peak Detection&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+    <span class="k">except</span> <span class="ne">RuntimeError</span><span class="p">:</span>
+        <span class="n">x_peak</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">y_peak</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="k">return</span> <span class="n">x_peak</span><span class="p">,</span> <span class="n">y_peak</span></div>
+
+
+<div class="viewcode-block" id="process_subset_images"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.track.process_subset_images">[docs]</a><span class="k">def</span> <span class="nf">process_subset_images</span><span class="p">(</span>
+    <span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_images</span><span class="p">,</span> <span class="n">subset_centers</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">calculate_normalized_correlation</span><span class="p">,</span> <span class="n">subpixel</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process a set images (nominally subsets of a larger image) by calculating shifts and correlation maps with respect to a reference image.</span>
+
+<span class="sd">    This function processes a list of subset images by calculating the subpixel shifts and correlation maps</span>
+<span class="sd">    with respect to a given reference image. It utilizes a specified correlation method to perform the</span>
+<span class="sd">    calculations.</span>
+
+<span class="sd">    :param reference_image: numpy.ndarray</span>
+<span class="sd">        The reference image to which the subset images will be compared. Should be a 2D numpy array representing the grayscale image.</span>
+
+<span class="sd">    :param subset_images: List[numpy.ndarray]</span>
+<span class="sd">        A list of subset images to be processed. Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.</span>
+
+<span class="sd">    :param subset_centers: List[tuple]</span>
+<span class="sd">        A list of tuples (row_center, col_center) specifying the centers of the subset images.</span>
+<span class="sd">        Each tuple represents the center position (row, column) of the corresponding subset image.</span>
+
+<span class="sd">    :param plot: bool, optional</span>
+<span class="sd">        A boolean flag to determine whether to plot individual graphs for each subset image.</span>
+<span class="sd">        If True, plots will be generated for each subset image. Defaults to False.</span>
+
+<span class="sd">    :param method: function, optional</span>
+<span class="sd">        The method used to calculate the correlation between the reference image and subset images.</span>
+<span class="sd">        This function should take the reference image, subset images, and subset centers as inputs and return</span>
+<span class="sd">        a list of correlation maps for each subset. Defaults to `calculate_normalized_correlation`, a predefined function.</span>
+
+<span class="sd">    :param subpixel: bool, optional</span>
+<span class="sd">        A boolean flag to determine whether to compute subpixel shifts. If True, the function will compute</span>
+<span class="sd">        subpixel shifts between the reference image and each subset image. Default is False.</span>
+
+<span class="sd">    :return: dict</span>
+<span class="sd">        A dictionary containing the processed results for each subset image.</span>
+<span class="sd">        The dictionary includes the following keys:</span>
+
+<span class="sd">            - &#39;subset_centers&#39;: A list of tuples (row_center, col_center) representing the centers of the subset images.</span>
+
+<span class="sd">            - &#39;subpixel_shifts&#39;: A list of tuples (subpixel_shift_x, subpixel_shift_y) indicating the subpixel shifts</span>
+<span class="sd">              between the reference image and each subset image. This key will be present only if subpixel is True.</span>
+
+<span class="sd">            - &#39;shifts&#39;: A list of tuples (shift_x, shift_y) indicating the shifts between the reference image and</span>
+<span class="sd">              each subset image, computed as the peak positions in the correlation maps.</span>
+
+<span class="sd">    :raises:</span>
+<span class="sd">        AssertionError: If the method is &#39;match_template&#39; and subpixel is set to True. Subpixel resolution is not compatible with the &#39;match_template&#39; method.</span>
+
+<span class="sd">    :Example:</span>
+<span class="sd">        &gt;&gt;&gt; reference_img = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])</span>
+<span class="sd">        &gt;&gt;&gt; subset_imgs = [np.array([[0.1, 0.2], [0.4, 0.5]]), np.array([[0.8, 0.9], [0.5, 0.6]])]</span>
+<span class="sd">        &gt;&gt;&gt; centers = [(0, 0), (1, 1)]</span>
+<span class="sd">        &gt;&gt;&gt; results = process_subset_images(reference_img, subset_imgs, centers, plot=True)</span>
+
+<span class="sd">    :Note:</span>
+<span class="sd">        - The reference image and subset images should be grayscale images of the same dtype and proper dimensions.</span>
+<span class="sd">        - The subset_centers should correspond to the centers of the respective subset images.</span>
+<span class="sd">        - The method parameter allows for custom correlation methods to be used, with a default method provided.</span>
+<span class="sd">        - If plot is set to True, individual plots will be generated for each subset image, displaying the subset image,</span>
+<span class="sd">          reference image, and magnitude of the correlation map.</span>
+<span class="sd">        - Subpixel shifts will be calculated only if subpixel is True.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="c1"># Initialize a dictionary to store the results for each subset image</span>
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;subset_centers&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;subpixel_shifts&quot;</span><span class="p">:</span> <span class="p">[],</span> <span class="s2">&quot;shifts&quot;</span><span class="p">:</span> <span class="p">[]}</span>
+
+    <span class="k">if</span> <span class="n">method</span> <span class="o">==</span> <span class="n">match_template</span><span class="p">:</span>
+        <span class="k">assert</span> <span class="n">subpixel</span> <span class="ow">is</span> <span class="kc">False</span><span class="p">,</span> <span class="s2">&quot;subpixel resolution not compatible with method &#39;match_template&#39; &quot;</span>
+        
+    <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="n">calculate_normalized_correlation</span><span class="p">,</span> <span class="n">calculate_correlation</span><span class="p">]:</span>
+        <span class="c1"># Calculate shifts, centers, and correlation maps with respect to the reference image</span>
+        <span class="n">correlations</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_images</span><span class="p">,</span> <span class="n">subset_centers</span><span class="p">)</span>
+    <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">match_template</span><span class="p">:</span>
+        <span class="n">max_corr_position</span> <span class="o">=</span> <span class="n">method</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_images</span><span class="p">,</span> <span class="n">method</span> <span class="o">=</span> <span class="s1">&#39;3&#39;</span><span class="p">)</span>
+        
+    <span class="c1"># Plot individual graphs for each subset image (if plot_graphs is True)</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">subset_image</span><span class="p">,</span> <span class="n">center</span><span class="p">,</span> <span class="n">correlation</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+        <span class="nb">zip</span><span class="p">(</span><span class="n">subset_images</span><span class="p">,</span> <span class="n">subset_centers</span><span class="p">,</span> <span class="n">correlations</span><span class="p">),</span> <span class="n">start</span><span class="o">=</span><span class="mi">0</span>
+    <span class="p">):</span>
+        
+        <span class="n">w</span> <span class="o">=</span> <span class="n">subset_image</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        
+        <span class="k">if</span> <span class="n">method</span> <span class="ow">in</span> <span class="p">[</span><span class="n">calculate_normalized_correlation</span><span class="p">,</span> <span class="n">calculate_correlation</span><span class="p">]:</span>
+            <span class="n">correlation_magnitude</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">correlation</span><span class="p">)</span>
+            <span class="n">max_corr_position</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">unravel_index</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">correlation_magnitude</span><span class="p">),</span> <span class="n">correlation_magnitude</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+        
+            <span class="n">corr_peaks</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_corr_position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_corr_position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            
+        <span class="k">elif</span> <span class="n">method</span> <span class="o">==</span> <span class="n">match_template</span><span class="p">:</span>
+            <span class="n">corr_peaks</span> <span class="o">=</span> <span class="p">(</span><span class="n">max_corr_position</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">max_corr_position</span><span class="p">[</span><span class="n">i</span><span class="p">][</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">w</span> <span class="o">//</span> <span class="mi">2</span> <span class="o">-</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        
+        <span class="c1"># Plot individual graphs for each subset image (if plot is True)</span>
+        <span class="k">if</span> <span class="n">plot</span><span class="p">:</span>
+            
+            <span class="k">assert</span> <span class="n">method</span> <span class="o">!=</span> <span class="n">match_template</span><span class="p">,</span> <span class="s2">&quot;plotting not supported for method = match_template&quot;</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">15</span><span class="p">,</span> <span class="mi">5</span><span class="p">))</span>
+
+            <span class="c1"># Plot the subset image</span>
+            <span class="n">ax1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">im1</span> <span class="o">=</span> <span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">subset_image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Subset Image </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x (pixels)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y (pixels)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax1</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">divider1</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax1</span><span class="p">)</span>
+            <span class="n">cax1</span> <span class="o">=</span> <span class="n">divider1</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="n">cbar1</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im1</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax1</span><span class="p">)</span>
+            <span class="n">cbar1</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">cbar1</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+            <span class="c1"># Plot the larger image with the center position and subset center</span>
+            <span class="n">ax2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+            <span class="n">im2</span> <span class="o">=</span> <span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s2">&quot;Reference Speckle&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;x (pixels)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;y (pixels)&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span><span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;blue&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Subset Center&quot;</span><span class="p">)</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="n">ax2</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">divider2</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax2</span><span class="p">)</span>
+            <span class="n">cax2</span> <span class="o">=</span> <span class="n">divider2</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="n">cbar2</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im2</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax2</span><span class="p">)</span>
+            <span class="n">cbar2</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;Intensity&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">cbar2</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+            <span class="c1"># Plot the magnitude of the correlation map with the center position and maximum correlation location</span>
+            <span class="n">ax3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplot</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">)</span>
+            <span class="n">im3</span> <span class="o">=</span> <span class="n">ax3</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">correlation_magnitude</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s2">&quot;viridis&quot;</span><span class="p">,</span> <span class="n">origin</span><span class="o">=</span><span class="s2">&quot;upper&quot;</span><span class="p">)</span>
+            <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correlation Map </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax3</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;$\Delta x$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax3</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;$\Delta y$&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">16</span><span class="p">)</span>
+            <span class="n">ax3</span><span class="o">.</span><span class="n">scatter</span><span class="p">(</span>
+                <span class="n">max_corr_position</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
+                <span class="n">max_corr_position</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                <span class="n">color</span><span class="o">=</span><span class="s2">&quot;green&quot;</span><span class="p">,</span>
+                <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;x&quot;</span><span class="p">,</span>
+                <span class="n">s</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+                <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Max Correlation&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">ax3</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+            <span class="n">ax3</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="s2">&quot;both&quot;</span><span class="p">,</span> <span class="n">which</span><span class="o">=</span><span class="s2">&quot;major&quot;</span><span class="p">,</span> <span class="n">labelsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">divider3</span> <span class="o">=</span> <span class="n">make_axes_locatable</span><span class="p">(</span><span class="n">ax3</span><span class="p">)</span>
+            <span class="n">cax3</span> <span class="o">=</span> <span class="n">divider3</span><span class="o">.</span><span class="n">append_axes</span><span class="p">(</span><span class="s2">&quot;right&quot;</span><span class="p">,</span> <span class="n">size</span><span class="o">=</span><span class="s2">&quot;5%&quot;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+            <span class="n">cbar3</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">colorbar</span><span class="p">(</span><span class="n">im3</span><span class="p">,</span> <span class="n">cax</span><span class="o">=</span><span class="n">cax3</span><span class="p">)</span>
+            <span class="n">cbar3</span><span class="o">.</span><span class="n">set_label</span><span class="p">(</span><span class="s2">&quot;Magnitude&quot;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">14</span><span class="p">)</span>
+            <span class="n">cbar3</span><span class="o">.</span><span class="n">ax</span><span class="o">.</span><span class="n">tick_params</span><span class="p">(</span><span class="n">labelsize</span><span class="o">=</span><span class="mi">12</span><span class="p">)</span>
+
+            <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+        
+        <span class="k">if</span> <span class="n">subpixel</span><span class="p">:</span>
+            
+            <span class="c1"># Fit a quadratic function to the correlation map and find its peak within a specified window</span>
+            <span class="n">peak_x</span><span class="p">,</span> <span class="n">peak_y</span> <span class="o">=</span> <span class="n">fit_gaussian_and_find_peak</span><span class="p">(</span>
+                <span class="n">correlation_magnitude</span><span class="p">,</span> <span class="n">subset_image</span><span class="o">.</span><span class="n">shape</span><span class="p">,</span> <span class="n">subset_centers</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">plot</span><span class="o">=</span><span class="n">plot</span>
+            <span class="p">)</span>
+            <span class="n">peaks</span> <span class="o">=</span> <span class="p">(</span><span class="n">peak_x</span> <span class="o">+</span> <span class="n">corr_peaks</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">peak_y</span> <span class="o">+</span> <span class="n">corr_peaks</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+            <span class="n">results</span><span class="p">[</span><span class="s2">&quot;subpixel_shifts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">peaks</span><span class="p">)</span>
+
+        <span class="c1"># Append the values to the corresponding lists in the results dictionary</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;subset_centers&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">center</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">center</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+        <span class="n">results</span><span class="p">[</span><span class="s2">&quot;shifts&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">corr_peaks</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="process_single_image"><a class="viewcode-back" href="../../../usage.html#tiepy.speckle.track.process_single_image">[docs]</a><span class="k">def</span> <span class="nf">process_single_image</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">sample_image</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="n">calculate_normalized_correlation</span><span class="p">,</span> <span class="n">subpixel</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">extra_metadata</span> <span class="o">=</span> <span class="p">{}):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process a single image by extracting subsets, computing correlation, and subpixel shifts.</span>
+
+<span class="sd">    :param reference_image: numpy.ndarray</span>
+<span class="sd">        The reference image to which the subset images will be compared.</span>
+
+<span class="sd">    :param sample_image: numpy.ndarray</span>
+<span class="sd">        The input 2D image array to be processed.</span>
+
+<span class="sd">    :param window_size: int</span>
+<span class="sd">        The window size for cropping subsets. The window will be a square of size window_size x window_size.</span>
+
+<span class="sd">    :param step_size: int</span>
+<span class="sd">        The step size for moving the window in both the x and y directions.</span>
+
+<span class="sd">    :param padding: int, optional</span>
+<span class="sd">        The padding distance from the image boundaries. The window will not be drawn within this distance</span>
+<span class="sd">        from the edges of the image. Default is 0.</span>
+
+<span class="sd">    :param method: callable, optional</span>
+<span class="sd">        The method to be used for computing the correlation between the reference and subset images.</span>
+<span class="sd">        It should be a callable function that accepts two numpy.ndarray arguments and returns a 2D correlation map.</span>
+<span class="sd">        Defaults to `calculate_normalized_correlation`.</span>
+
+<span class="sd">    :param subpixel: bool, optional</span>
+<span class="sd">        A boolean flag to determine whether to compute subpixel shifts. If True, the function will compute</span>
+<span class="sd">        subpixel shifts between the reference image and each subset image. Default is False.</span>
+
+<span class="sd">    :param plot: bool, optional</span>
+<span class="sd">        A boolean flag to determine whether to plot individual graphs for each subset image. Default is False.</span>
+
+<span class="sd">    :param extra_metadata: dict, optional</span>
+<span class="sd">        Additional metadata to include in the results dictionary. This should be provided as a dictionary</span>
+<span class="sd">        containing key-value pairs representing the metadata. Default is an empty dictionary.</span>
+
+<span class="sd">    :return: dict</span>
+<span class="sd">        A dictionary containing the processed results for each subset image.</span>
+<span class="sd">        The dictionary includes the following keys:</span>
+
+<span class="sd">            - &#39;coords_x&#39;: numpy.ndarray</span>
+<span class="sd">                A 1D array containing the horizontal (x) coordinates of the centers of the subset images.</span>
+
+<span class="sd">            - &#39;coords_y&#39;: numpy.ndarray</span>
+<span class="sd">                A 1D array containing the vertical (y) coordinates of the centers of the subset images.</span>
+
+<span class="sd">            - &#39;shifts_x&#39;: numpy.ndarray</span>
+<span class="sd">                A 1D array containing the horizontal (x) shifts between the reference image and each subset image,</span>
+<span class="sd">                computed as the peak positions in the correlation maps.</span>
+
+<span class="sd">            - &#39;shifts_y&#39;: numpy.ndarray</span>
+<span class="sd">                A 1D array containing the vertical (y) shifts between the reference image and each subset image,</span>
+<span class="sd">                computed as the peak positions in the correlation maps.</span>
+
+<span class="sd">            - &#39;subpixel_shifts_x&#39;: numpy.ndarray (optional)</span>
+<span class="sd">                A 1D array containing the horizontal (x) subpixel shifts between the reference image and each subset image.</span>
+<span class="sd">                This key will be present in the dictionary only if the &#39;subpixel&#39; parameter is set to True.</span>
+
+<span class="sd">            - &#39;subpixel_shifts_y&#39;: numpy.ndarray (optional)</span>
+<span class="sd">                A 1D array containing the vertical (y) subpixel shifts between the reference image and each subset image.</span>
+<span class="sd">                This key will be present in the dictionary only if the &#39;subpixel&#39; parameter is set to True.</span>
+
+<span class="sd">            - Additional Metadata (optional):</span>
+<span class="sd">                This dictionary can include any additional metadata specified by the &#39;extra_metadata&#39; parameter.</span>
+
+<span class="sd">    :Example:</span>
+<span class="sd">        &gt;&gt;&gt; import numpy as np</span>
+<span class="sd">        &gt;&gt;&gt; reference_image = np.random.rand(100, 100)  # Example 2D reference image of size 100x100</span>
+<span class="sd">        &gt;&gt;&gt; sample_image = np.random.rand(300, 300)  # Example 2D sample image of size 300x300</span>
+<span class="sd">        &gt;&gt;&gt; window_size = 50</span>
+<span class="sd">        &gt;&gt;&gt; step_size = 10</span>
+<span class="sd">        &gt;&gt;&gt; padding = 20</span>
+<span class="sd">        &gt;&gt;&gt; results = process_single_image(reference_image, sample_image, window_size, step_size, padding, plot=True)</span>
+
+<span class="sd">    :Note:</span>
+<span class="sd">        - The &#39;reference_image&#39; and &#39;sample_image&#39; should be 2D numpy arrays with proper dimensions.</span>
+<span class="sd">        - The &#39;window_size&#39; and &#39;step_size&#39; should be positive integers.</span>
+<span class="sd">        - The &#39;padding&#39; should be a non-negative integer.</span>
+<span class="sd">        - The &#39;method&#39; parameter determines the correlation method used and should be a callable function.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    
+    <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">extra_metadata</span><span class="p">)</span> <span class="o">==</span> <span class="nb">dict</span><span class="p">,</span> <span class="s2">&quot;Metadata should be in dictionary format&quot;</span>
+    
+    <span class="n">subset</span><span class="p">,</span> <span class="n">centers</span> <span class="o">=</span> <span class="n">get_subsets</span><span class="p">(</span><span class="n">sample_image</span><span class="p">,</span> <span class="n">window_size</span><span class="o">=</span><span class="n">window_size</span><span class="p">,</span> <span class="n">step_size</span><span class="o">=</span><span class="n">step_size</span><span class="p">,</span> <span class="n">padding</span><span class="o">=</span><span class="n">padding</span><span class="p">)</span>
+    <span class="n">shift_results</span> <span class="o">=</span> <span class="n">process_subset_images</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">subset_images</span><span class="o">=</span><span class="n">subset</span><span class="p">,</span> <span class="n">subset_centers</span><span class="o">=</span><span class="n">centers</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="n">plot</span><span class="p">)</span>
+
+    <span class="n">results</span> <span class="o">=</span> <span class="p">{}</span>
+    
+    <span class="c1"># Add metadata to results</span>
+    <span class="n">results</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">extra_metadata</span><span class="p">)</span>
+    
+    <span class="c1"># Convert list of tuples to NumPy arrays for better structure</span>
+    <span class="n">coords_x</span><span class="p">,</span> <span class="n">coords_y</span><span class="p">,</span> <span class="n">shifts_x</span><span class="p">,</span> <span class="n">shifts_y</span> <span class="o">=</span> <span class="n">construct_arrays</span><span class="p">(</span>
+        <span class="n">shift_results</span><span class="p">[</span><span class="s2">&quot;subset_centers&quot;</span><span class="p">],</span> <span class="n">shift_results</span><span class="p">[</span><span class="s2">&quot;shifts&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">subpixel_shifts_x</span><span class="p">,</span> <span class="n">subpixel_shifts_y</span> <span class="o">=</span> <span class="n">construct_arrays</span><span class="p">(</span>
+        <span class="n">shift_results</span><span class="p">[</span><span class="s2">&quot;subset_centers&quot;</span><span class="p">],</span> <span class="n">shift_results</span><span class="p">[</span><span class="s2">&quot;subpixel_shifts&quot;</span><span class="p">]</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Store NumPy arrays in the dictionary with descriptive keys</span>
+    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;coords_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_x</span>  <span class="c1"># Horizontal (x) coordinates of the centers of the subset images.</span>
+    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;coords_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">coords_y</span>  <span class="c1"># Vertical (y) coordinates of the centers of the subset images.</span>
+    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;shifts_x&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shifts_x</span>  <span class="c1"># Horizontal (x) shifts between the reference image and each subset image.</span>
+    <span class="n">results</span><span class="p">[</span><span class="s2">&quot;shifts_y&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">shifts_y</span>  <span class="c1"># Vertical (y) shifts between the reference image and each subset image.</span>
+    
+    <span class="k">if</span> <span class="n">subpixel</span> <span class="o">==</span> <span class="kc">True</span><span class="p">:</span>
+            
+        <span class="n">results</span><span class="p">[</span>
+            <span class="s2">&quot;subpixel_shifts_x&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">subpixel_shifts_x</span>  <span class="c1"># Horizontal (x) subpixel shifts between the reference image and each subset image.</span>
+        <span class="n">results</span><span class="p">[</span>
+            <span class="s2">&quot;subpixel_shifts_y&quot;</span>
+        <span class="p">]</span> <span class="o">=</span> <span class="n">subpixel_shifts_y</span>  <span class="c1"># Vertical (y) subpixel shifts between the reference image and each subset image.</span>
+    
+    
+    <span class="k">return</span> <span class="n">results</span></div>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2023, Trey Guest.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

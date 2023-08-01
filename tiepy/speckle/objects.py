@@ -10,8 +10,6 @@ that can be applied to 2D arrays to create different synthetic images.
 """
 
 import numpy as np
-import scipy.signal
-import matplotlib.pyplot as plt
 from scipy.ndimage import gaussian_filter
 
 

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+  <meta charset="utf-8" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Usage &mdash; tiepy 0.0.2.post0.dev0+g09b954c documentation</title>
+  <title>Usage &mdash; tiepy 0.post18.dev0+gc31cc9f documentation</title>
       <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
       <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
       <link rel="stylesheet" href="_static/plot_directive.css" type="text/css" />
@@ -14,9 +14,8 @@
   <![endif]-->
   
         <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
-        <script src="_static/jquery.js"></script>
-        <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/sphinx_highlight.js"></script>
         <script src="_static/clipboard.min.js"></script>
         <script src="_static/copybutton.js"></script>
     <script src="_static/js/theme.js"></script>
@@ -31,14 +30,18 @@
     <nav data-toggle="wy-nav-shift" class="wy-nav-side">
       <div class="wy-side-scroll">
         <div class="wy-side-nav-search" >
-            <a href="index.html" class="icon icon-home"> tiepy
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            tiepy
           </a>
               <div class="version">
-                0.0.2.post0.dev0+g09b954c
+                0.post18.dev0+gc31cc9f
               </div>
 <div role="search">
   <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
-    <input type="text" name="q" placeholder="Search docs" />
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
     <input type="hidden" name="check_keywords" value="yes" />
     <input type="hidden" name="area" value="default" />
   </form>
@@ -47,6 +50,35 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="#api">API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#core-functions">Core Functions</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tiepy.speckle.track.fit_gaussian_and_find_peak"><code class="docutils literal notranslate"><span class="pre">fit_gaussian_and_find_peak()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tiepy.speckle.track.process_subset_images"><code class="docutils literal notranslate"><span class="pre">process_subset_images()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tiepy.speckle.track.process_single_image"><code class="docutils literal notranslate"><span class="pre">process_single_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tracking-methods">Tracking Methods</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.track.match_template"><code class="docutils literal notranslate"><span class="pre">match_template()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.track.calculate_correlation"><code class="docutils literal notranslate"><span class="pre">calculate_correlation()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.track.calculate_normalized_correlation"><code class="docutils literal notranslate"><span class="pre">calculate_normalized_correlation()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#phase-retrieval">Phase Retrieval</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#tiepy.speckle.phase_retrieval.kottler"><code class="docutils literal notranslate"><span class="pre">kottler()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#tiepy.speckle.phase_retrieval.paganin_algorithm"><code class="docutils literal notranslate"><span class="pre">paganin_algorithm()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#utilities">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#io">IO</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#test-samples">Test Samples</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.objects.generate_speckle_pattern"><code class="docutils literal notranslate"><span class="pre">generate_speckle_pattern()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#tiepy.speckle.objects.generate_gaussian_2d"><code class="docutils literal notranslate"><span class="pre">generate_gaussian_2d()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="release-history.html">Release History</a></li>
 <li class="toctree-l1"><a class="reference internal" href="min_versions.html">Minimum Version of Python and NumPy</a></li>
 </ul>
@@ -64,7 +96,7 @@
         <div class="rst-content">
           <div role="navigation" aria-label="Page navigation">
   <ul class="wy-breadcrumbs">
-      <li><a href="index.html" class="icon icon-home"></a></li>
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
       <li class="breadcrumb-item active">Usage</li>
       <li class="wy-breadcrumbs-aside">
             <a href="_sources/usage.rst.txt" rel="nofollow"> View page source</a>
@@ -76,11 +108,447 @@
            <div itemprop="articleBody">
              
   <section id="usage">
-<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h1>
+<h1>Usage<a class="headerlink" href="#usage" title="Permalink to this heading">¶</a></h1>
 <p>Start by importing tiepy.</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tiepy</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">tiepy</span><span class="o">-</span><span class="n">xfel</span>
 </pre></div>
 </div>
+</section>
+<section id="api">
+<h1>API<a class="headerlink" href="#api" title="Permalink to this heading">¶</a></h1>
+<section id="core-functions">
+<h2>Core Functions<a class="headerlink" href="#core-functions" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.track.fit_gaussian_and_find_peak">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.track.</span></span><span class="sig-name descname"><span class="pre">fit_gaussian_and_find_peak</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">correlation_map</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/track.html#fit_gaussian_and_find_peak"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.track.fit_gaussian_and_find_peak" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fit a gaussian function to a window of the correlation map and find the peak coordinates.</p>
+<p>This function fits a quadratic function to a window of the correlation map centered around the
+specified subset_center. It then identifies the peak coordinates within the window.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="simple">
+<dt>correlation_map: The correlation map used for fitting and peak detection. [numpy.ndarray]</dt><dd><p>Should be a 2D numpy array representing the correlation map.</p>
+</dd>
+<dt>window_shape: A tuple (window_width, window_height) specifying the dimensions of the fitting window. [tuple]</dt><dd><p>The window is centered around the subset_center and should be smaller than the correlation_map.</p>
+</dd>
+<dt>subset_center: A tuple (center_x, center_y) specifying the center of the subset for the window. [tuple]</dt><dd><p>The subset_center should correspond to the center of the region of interest within the correlation_map.</p>
+</dd>
+<dt>plot: A boolean flag to determine whether to plot the fitting results. [bool, optional]</dt><dd><p>If True, the function will generate a plot showing the measured and fitted intensity data.
+Defaults to False.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>tuple: A tuple (x_peak, y_peak) representing the peak coordinates in the fitted quadratic function. [tuple]</dt><dd><p>The coordinates are relative to the corrected center of the subset.</p>
+</dd>
+</dl>
+</dd>
+<dt>Notes:</dt><dd><ul class="simple">
+<li><p>The correlation_map should be a 2D numpy array with proper dimensions.</p></li>
+<li><p>The window_shape should be smaller than the dimensions of the correlation_map for accurate fitting.</p></li>
+<li><p>The subset_center should correspond to the center of the region of interest within the correlation_map.</p></li>
+<li><p>The function uses a quadratic fitting method and a Gaussian function for fitting the data.</p></li>
+<li><p>The peak coordinates returned are relative to the corrected center of the subset.</p></li>
+<li><p>If plot is set to True, the function will generate a 3D plot displaying the measured and fitted intensity data.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.track.process_subset_images">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.track.</span></span><span class="sig-name descname"><span class="pre">process_subset_images</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_centers</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method=&lt;function</span> <span class="pre">calculate_normalized_correlation&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpixel=True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/track.html#process_subset_images"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.track.process_subset_images" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a set images (nominally subsets of a larger image) by calculating shifts and correlation maps with respect to a reference image.</p>
+<p>This function processes a list of subset images by calculating the subpixel shifts and correlation maps
+with respect to a given reference image. It utilizes a specified correlation method to perform the
+calculations.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference_image</strong> – numpy.ndarray
+The reference image to which the subset images will be compared. Should be a 2D numpy array representing the grayscale image.</p></li>
+<li><p><strong>subset_images</strong> – List[numpy.ndarray]
+A list of subset images to be processed. Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.</p></li>
+<li><p><strong>subset_centers</strong> – List[tuple]
+A list of tuples (row_center, col_center) specifying the centers of the subset images.
+Each tuple represents the center position (row, column) of the corresponding subset image.</p></li>
+<li><p><strong>plot</strong> – bool, optional
+A boolean flag to determine whether to plot individual graphs for each subset image.
+If True, plots will be generated for each subset image. Defaults to False.</p></li>
+<li><p><strong>method</strong> – function, optional
+The method used to calculate the correlation between the reference image and subset images.
+This function should take the reference image, subset images, and subset centers as inputs and return
+a list of correlation maps for each subset. Defaults to <cite>calculate_normalized_correlation</cite>, a predefined function.</p></li>
+<li><p><strong>subpixel</strong> – bool, optional
+A boolean flag to determine whether to compute subpixel shifts. If True, the function will compute
+subpixel shifts between the reference image and each subset image. Default is False.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>dict
+A dictionary containing the processed results for each subset image.
+The dictionary includes the following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><p>’subset_centers’: A list of tuples (row_center, col_center) representing the centers of the subset images.</p></li>
+<li><p>’subpixel_shifts’: A list of tuples (subpixel_shift_x, subpixel_shift_y) indicating the subpixel shifts
+between the reference image and each subset image. This key will be present only if subpixel is True.</p></li>
+<li><p>’shifts’: A list of tuples (shift_x, shift_y) indicating the shifts between the reference image and
+each subset image, computed as the peak positions in the correlation maps.</p></li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError: If the method is ‘match_template’ and subpixel is set to True. Subpixel resolution is not compatible with the ‘match_template’ method.</p>
+</dd>
+<dt class="field-even">Example<span class="colon">:</span></dt>
+<dd class="field-even"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reference_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subset_imgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">centers</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">process_subset_images</span><span class="p">(</span><span class="n">reference_img</span><span class="p">,</span> <span class="n">subset_imgs</span><span class="p">,</span> <span class="n">centers</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt class="field-odd">Note<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p>The reference image and subset images should be grayscale images of the same dtype and proper dimensions.</p></li>
+<li><p>The subset_centers should correspond to the centers of the respective subset images.</p></li>
+<li><p>The method parameter allows for custom correlation methods to be used, with a default method provided.</p></li>
+<li><p>If plot is set to True, individual plots will be generated for each subset image, displaying the subset image,
+reference image, and magnitude of the correlation map.</p></li>
+<li><p>Subpixel shifts will be calculated only if subpixel is True.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.track.process_single_image">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.track.</span></span><span class="sig-name descname"><span class="pre">process_single_image</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">window_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">step_size</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">padding=0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method=&lt;function</span> <span class="pre">calculate_normalized_correlation&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subpixel=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">plot=False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">extra_metadata={}</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/track.html#process_single_image"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.track.process_single_image" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process a single image by extracting subsets, computing correlation, and subpixel shifts.</p>
+<dl class="field-list">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference_image</strong> – numpy.ndarray
+The reference image to which the subset images will be compared.</p></li>
+<li><p><strong>sample_image</strong> – numpy.ndarray
+The input 2D image array to be processed.</p></li>
+<li><p><strong>window_size</strong> – int
+The window size for cropping subsets. The window will be a square of size window_size x window_size.</p></li>
+<li><p><strong>step_size</strong> – int
+The step size for moving the window in both the x and y directions.</p></li>
+<li><p><strong>padding</strong> – int, optional
+The padding distance from the image boundaries. The window will not be drawn within this distance
+from the edges of the image. Default is 0.</p></li>
+<li><p><strong>method</strong> – callable, optional
+The method to be used for computing the correlation between the reference and subset images.
+It should be a callable function that accepts two numpy.ndarray arguments and returns a 2D correlation map.
+Defaults to <cite>calculate_normalized_correlation</cite>.</p></li>
+<li><p><strong>subpixel</strong> – bool, optional
+A boolean flag to determine whether to compute subpixel shifts. If True, the function will compute
+subpixel shifts between the reference image and each subset image. Default is False.</p></li>
+<li><p><strong>plot</strong> – bool, optional
+A boolean flag to determine whether to plot individual graphs for each subset image. Default is False.</p></li>
+<li><p><strong>extra_metadata</strong> – dict, optional
+Additional metadata to include in the results dictionary. This should be provided as a dictionary
+containing key-value pairs representing the metadata. Default is an empty dictionary.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p><p>dict
+A dictionary containing the processed results for each subset image.
+The dictionary includes the following keys:</p>
+<blockquote>
+<div><ul class="simple">
+<li><dl class="simple">
+<dt>’coords_x’: numpy.ndarray</dt><dd><p>A 1D array containing the horizontal (x) coordinates of the centers of the subset images.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’coords_y’: numpy.ndarray</dt><dd><p>A 1D array containing the vertical (y) coordinates of the centers of the subset images.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’shifts_x’: numpy.ndarray</dt><dd><p>A 1D array containing the horizontal (x) shifts between the reference image and each subset image,
+computed as the peak positions in the correlation maps.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’shifts_y’: numpy.ndarray</dt><dd><p>A 1D array containing the vertical (y) shifts between the reference image and each subset image,
+computed as the peak positions in the correlation maps.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’subpixel_shifts_x’: numpy.ndarray (optional)</dt><dd><p>A 1D array containing the horizontal (x) subpixel shifts between the reference image and each subset image.
+This key will be present in the dictionary only if the ‘subpixel’ parameter is set to True.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>’subpixel_shifts_y’: numpy.ndarray (optional)</dt><dd><p>A 1D array containing the vertical (y) subpixel shifts between the reference image and each subset image.
+This key will be present in the dictionary only if the ‘subpixel’ parameter is set to True.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt>Additional Metadata (optional):</dt><dd><p>This dictionary can include any additional metadata specified by the ‘extra_metadata’ parameter.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</div></blockquote>
+</p>
+</dd>
+<dt class="field-odd">Example<span class="colon">:</span></dt>
+<dd class="field-odd"><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">reference_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">100</span><span class="p">)</span>  <span class="c1"># Example 2D reference image of size 100x100</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">sample_image</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">rand</span><span class="p">(</span><span class="mi">300</span><span class="p">,</span> <span class="mi">300</span><span class="p">)</span>  <span class="c1"># Example 2D sample image of size 300x300</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">window_size</span> <span class="o">=</span> <span class="mi">50</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">step_size</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">padding</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">process_single_image</span><span class="p">(</span><span class="n">reference_image</span><span class="p">,</span> <span class="n">sample_image</span><span class="p">,</span> <span class="n">window_size</span><span class="p">,</span> <span class="n">step_size</span><span class="p">,</span> <span class="n">padding</span><span class="p">,</span> <span class="n">plot</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+<dt class="field-even">Note<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>The ‘reference_image’ and ‘sample_image’ should be 2D numpy arrays with proper dimensions.</p></li>
+<li><p>The ‘window_size’ and ‘step_size’ should be positive integers.</p></li>
+<li><p>The ‘padding’ should be a non-negative integer.</p></li>
+<li><p>The ‘method’ parameter determines the correlation method used and should be a callable function.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<section id="tracking-methods">
+<h3>Tracking Methods<a class="headerlink" href="#tracking-methods" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.track.match_template">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.track.</span></span><span class="sig-name descname"><span class="pre">match_template</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/track.html#match_template"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.track.match_template" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform template matching using OpenCV’s cv2.matchTemplate function on multiple subset images.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>reference_image</strong> – numpy.ndarray
+The reference image to be matched against the subset images. It should be a 2D array (grayscale image).</p></li>
+<li><p><strong>subset_images</strong> – list of numpy.ndarray
+A list containing the subset images to which the reference template will be matched.
+Each subset image should be a 2D array (grayscale image).</p></li>
+<li><p><strong>method</strong> – int, optional
+The method to be used for matching. Refer to cv2.matchTemplate documentation for method options.
+Defaults to 3 (cv2.TM_CCOEFF_NORMED).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>list of tuple
+A list containing the locations (x, y) of the best match in each subset image.
+Each location corresponds to the top-left corner of the matched region.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#AssertionError" title="(in Python v3.11)"><strong>AssertionError</strong></a> – <ul class="simple">
+<li><p>If the ‘method’ parameter is not of integer type or outside the range [0, 5].</p></li>
+</ul>
+</p>
+</dd>
+<dt class="field-even">Note<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>The ‘reference_image’ and each ‘subset_image’ should be grayscale images of the same dtype and have proper dimensions.</p></li>
+<li><p>The ‘method’ parameter determines the matching method to be used. It should be an integer index in the range [0, 5].</p></li>
+<li><p>The output list of tuples represents the locations of the best matches in the subset images.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.track.calculate_correlation">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.track.</span></span><span class="sig-name descname"><span class="pre">calculate_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_centers</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/track.html#calculate_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.track.calculate_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate correlation maps between a reference image and a list of subset images.</p>
+<p>This function calculates the correlation maps between a reference image and a list of subset images.
+The correlation maps represent the similarity between the reference image and each subset image.</p>
+<dl>
+<dt>Parameters:</dt><dd><dl class="simple">
+<dt>reference_image: The reference image to which the subset images will be compared. [numpy.ndarray]</dt><dd><p>Should be a 2D numpy array representing the grayscale image.</p>
+</dd>
+<dt>subset_images: A list of subset images to be compared with the reference image. [List[numpy.ndarray]]</dt><dd><p>Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.</p>
+</dd>
+<dt>subset_centers: A list of tuples (row_center, col_center) specifying the centers of the subset images. [List[tuple]]</dt><dd><p>Each tuple represents the center position (row, column) of the corresponding subset image.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>List[numpy.ndarray]: A list of 2D numpy arrays representing the correlation maps for each subset image.</dt><dd><p>Each correlation map represents the similarity between the reference image and the respective subset image.</p>
+</dd>
+</dl>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reference_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subset_imgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">centers</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">correlation_maps</span> <span class="o">=</span> <span class="n">calculate_correlation</span><span class="p">(</span><span class="n">reference_img</span><span class="p">,</span> <span class="n">subset_imgs</span><span class="p">,</span> <span class="n">centers</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.track.calculate_normalized_correlation">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.track.</span></span><span class="sig-name descname"><span class="pre">calculate_normalized_correlation</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">reference_image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">subset_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">normalize</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/track.html#calculate_normalized_correlation"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.track.calculate_normalized_correlation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate normalized correlation maps between a reference image and a list of subset images.</p>
+<p>This function calculates the normalized correlation maps between a reference image and a list of subset images.
+The correlation maps represent the similarity between the reference image and each subset image after normalization.</p>
+<dl>
+<dt>Parameters:</dt><dd><dl class="simple">
+<dt>reference_image: The reference image to which the subset images will be compared. [numpy.ndarray]</dt><dd><p>Should be a 2D numpy array representing the grayscale image.</p>
+</dd>
+<dt>subset_images: A list of subset images to be compared with the reference image. [List[numpy.ndarray]]</dt><dd><p>Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.</p>
+</dd>
+<dt>normalize: A boolean flag to determine whether to normalize the reference and subset images. [bool, optional]</dt><dd><p>If True, the images will be normalized before calculating the correlation. Defaults to True.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><dl class="simple">
+<dt>List[numpy.ndarray]: A list of 2D numpy arrays representing the normalized correlation maps for each subset image.</dt><dd><p>Each correlation map represents the similarity between the reference image and the respective subset image.</p>
+</dd>
+</dl>
+</dd>
+<dt>Example:</dt><dd><div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">reference_img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="mf">0.3</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">]])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">subset_imgs</span> <span class="o">=</span> <span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.4</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">]]),</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="mf">0.8</span><span class="p">,</span> <span class="mf">0.9</span><span class="p">],</span> <span class="p">[</span><span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.6</span><span class="p">]])]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">normalized_correlation_maps</span> <span class="o">=</span> <span class="n">calculate_normalized_correlation</span><span class="p">(</span><span class="n">reference_img</span><span class="p">,</span> <span class="n">subset_imgs</span><span class="p">,</span> <span class="n">normalize</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+<section id="phase-retrieval">
+<h2>Phase Retrieval<a class="headerlink" href="#phase-retrieval" title="Permalink to this heading">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.phase_retrieval.kottler">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.phase_retrieval.</span></span><span class="sig-name descname"><span class="pre">kottler</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dX</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dY</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/phase_retrieval.html#kottler"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.phase_retrieval.kottler" title="Permalink to this definition">¶</a></dt>
+<dd><p>Perform Kottler phase retrieval on a given complex-valued object.</p>
+<p>This function applies the Kottler method for phase retrieval on a complex-valued object
+represented by the real and imaginary parts dX and dY, respectively. The Kottler method
+uses the Fast Fourier Transform (FFT) to estimate the phase of the object.</p>
+<dl class="simple">
+<dt>Parameters:</dt><dd><dl class="simple">
+<dt>dX (numpy.ndarray): 2D array representing the real part of the complex object.</dt><dd><p>Shape should be (Nx, Ny), where Nx and Ny are the dimensions of the object.</p>
+</dd>
+<dt>dY (numpy.ndarray): 2D array representing the imaginary part of the complex object.</dt><dd><p>Shape should be (Nx, Ny), matching the dimensions of dX.</p>
+</dd>
+</dl>
+</dd>
+<dt>Returns:</dt><dd><p>numpy.ndarray: 2D array containing the estimated phase of the complex object.</p>
+</dd>
+<dt>Notes:</dt><dd><ul class="simple">
+<li><p>The input arrays dX and dY should have the same shape and dtype.</p></li>
+<li><p>The output array phi3 will contain the estimated phase of the complex object.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.phase_retrieval.paganin_algorithm">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.phase_retrieval.</span></span><span class="sig-name descname"><span class="pre">paganin_algorithm</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">ii</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">z</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">wav</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">delta</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">beta</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/phase_retrieval.html#paganin_algorithm"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.phase_retrieval.paganin_algorithm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Paganin Algorithm for phase retrieval.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ii</strong> – numpy.ndarray
+4D array of shape (Nx, Ny, K, N), representing the set of K by N projection images.
+Nx and Ny are the dimensions of each image, K is the number of projection angles,
+and N is the number of iterations.</p></li>
+<li><p><strong>z</strong> – float
+Propagation distance. The distance between the object and the detector.</p></li>
+<li><p><strong>wav</strong> – float
+X-ray wavelength.</p></li>
+<li><p><strong>delta</strong> – float
+Refractive index decrement.</p></li>
+<li><p><strong>beta</strong> – float
+X-ray attenuation coefficient.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>numpy.ndarray
+4D array of shape (Nx, Ny, K, N), containing the estimated phase for each projection image.</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p>AssertionError: If the input ‘ii’ does not have dtype ‘float64’.</p>
+</dd>
+<dt class="field-even">Notes<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p>The input ii should have dtype ‘float64’.</p></li>
+<li><p>The output phase represents the estimated phase shift caused by the object.</p></li>
+</ul>
+</dd>
+<dt class="field-odd">Reference<span class="colon">:</span></dt>
+<dd class="field-odd"><p>D. Paganin, “Simultaneous phase and amplitude extraction from a single defocused image of a homogeneous object,”
+Journal of Microscopy, vol. 206, no. 1, pp. 33-40, 2002.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="utilities">
+<h2>Utilities<a class="headerlink" href="#utilities" title="Permalink to this heading">¶</a></h2>
+<section id="io">
+<h3>IO<a class="headerlink" href="#io" title="Permalink to this heading">¶</a></h3>
+<p>tiepy.speckle.io.print_h5_keys
+tiepy.speckle.io.load_tiff_as_npy
+tiepy.speckle.io.get_keys
+tiepy.speckle.io.create_virtual_h5
+tiepy.speckle.io.save_dict_to_h5
+tiepy.speckle.io.load_dict_from_h5
+tiepy.speckle.io.load_key_from_virtual_h5</p>
+</section>
+<section id="test-samples">
+<h3>Test Samples<a class="headerlink" href="#test-samples" title="Permalink to this heading">¶</a></h3>
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.objects.generate_speckle_pattern">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.objects.</span></span><span class="sig-name descname"><span class="pre">generate_speckle_pattern</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">intensity_range</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">speckle_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/objects.html#generate_speckle_pattern"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.objects.generate_speckle_pattern" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a speckle pattern (gaussian filtered random noise) array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shape</strong> – A tuple (rows, columns) specifying the shape of the array. [tuple]</p></li>
+<li><p><strong>intensity_range</strong> – A tuple (min_intensity, max_intensity) specifying the range of intensity values. [tuple]</p></li>
+<li><p><strong>speckle_size</strong> – width of gaussian filter</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 2D numpy array containing the speckle pattern. [numpy.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tiepy.speckle.objects.generate_gaussian_2d">
+<span class="sig-prename descclassname"><span class="pre">tiepy.speckle.objects.</span></span><span class="sig-name descname"><span class="pre">generate_gaussian_2d</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">shape</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">center</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigma</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/tiepy/speckle/objects.html#generate_gaussian_2d"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#tiepy.speckle.objects.generate_gaussian_2d" title="Permalink to this definition">¶</a></dt>
+<dd><p>Generate a 2D Gaussian array.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>shape</strong> – A tuple (rows, columns) specifying the shape of the array. [tuple]</p></li>
+<li><p><strong>center</strong> – A tuple (row_center, col_center) specifying the center of the Gaussian. [tuple]</p></li>
+<li><p><strong>sigma</strong> – A float representing the standard deviation of the Gaussian. [float]</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>A 2D numpy array containing the Gaussian. [numpy.ndarray]</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
 </section>
 
 
