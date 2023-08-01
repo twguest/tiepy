@@ -10,7 +10,7 @@ import versioneer
 # and/or pip.
 min_version = (
     3,
-    8,
+    7,
 )
 if sys.version_info < min_version:
     error = """
@@ -39,7 +39,7 @@ with open(path.join(here, "requirements.txt")) as requirements_file:
 
 
 setup(
-    name="tiepy",
+    name="tiepy-xfel",
     version=versioneer.get_version(),
     cmdclass=versioneer.get_cmdclass(),
     description="Solutions to the Transport of Intensity Equation in Python",

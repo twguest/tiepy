@@ -40,29 +40,29 @@ Note:
 """
 
 
-
 import numpy as np
 import scipy.signal
 import matplotlib.pyplot as plt
 
-from tiepy.speckle.utils import get_subsets, reshape_to_2d
+from tiepy.speckle.utils import get_subsets, reshape_to_2d, construct_arrays
+from tiepy.speckle.phase_retrieval import kottler
 from tqdm import tqdm
 
 from mpl_toolkits.axes_grid1 import make_axes_locatable
- 
+
 
 def normalize_image(image):
     """
     Normalize an image by subtracting the mean and dividing by the standard deviation.
-    
+
     This function normalizes an input image by subtracting its mean value and dividing by its standard deviation.
-    
+
     Parameters:
         image: The input image to be normalized. [numpy.ndarray]
-    
+
     Returns:
         numpy.ndarray: A 2D numpy array representing the normalized image.
-    
+
     Example:
         >>> image = np.array([[10, 20, 30], [40, 50, 60], [70, 80, 90]])
         >>> normalized_image = normalize_image(image)
@@ -71,49 +71,50 @@ def normalize_image(image):
     return (image - np.mean(image)) / np.std(image)
 
 
-def calculate_correlation(reference_image,  subset_images, subset_centers):
+def calculate_correlation(reference_image, subset_images, subset_centers):
     """
-   Calculate correlation maps between a reference image and a list of subset images.
+    Calculate correlation maps between a reference image and a list of subset images.
 
-   This function calculates the correlation maps between a reference image and a list of subset images.
-   The correlation maps represent the similarity between the reference image and each subset image.
+    This function calculates the correlation maps between a reference image and a list of subset images.
+    The correlation maps represent the similarity between the reference image and each subset image.
 
-   Parameters:
-       reference_image: The reference image to which the subset images will be compared. [numpy.ndarray]
-                        Should be a 2D numpy array representing the grayscale image.
-       subset_images: A list of subset images to be compared with the reference image. [List[numpy.ndarray]]
-                      Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.
-       subset_centers: A list of tuples (row_center, col_center) specifying the centers of the subset images. [List[tuple]]
-                       Each tuple represents the center position (row, column) of the corresponding subset image.
+    Parameters:
+        reference_image: The reference image to which the subset images will be compared. [numpy.ndarray]
+                         Should be a 2D numpy array representing the grayscale image.
+        subset_images: A list of subset images to be compared with the reference image. [List[numpy.ndarray]]
+                       Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.
+        subset_centers: A list of tuples (row_center, col_center) specifying the centers of the subset images. [List[tuple]]
+                        Each tuple represents the center position (row, column) of the corresponding subset image.
 
-   Returns:
-       List[numpy.ndarray]: A list of 2D numpy arrays representing the correlation maps for each subset image.
-                            Each correlation map represents the similarity between the reference image and the respective subset image.
+    Returns:
+        List[numpy.ndarray]: A list of 2D numpy arrays representing the correlation maps for each subset image.
+                             Each correlation map represents the similarity between the reference image and the respective subset image.
 
-   Example:
-       >>> reference_img = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])
-       >>> subset_imgs = [np.array([[0.1, 0.2], [0.4, 0.5]]), np.array([[0.8, 0.9], [0.5, 0.6]])]
-       >>> centers = [(0, 0), (1, 1)]
-       >>> correlation_maps = calculate_correlation(reference_img, subset_imgs, centers)
-   """
+    Example:
+        >>> reference_img = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])
+        >>> subset_imgs = [np.array([[0.1, 0.2], [0.4, 0.5]]), np.array([[0.8, 0.9], [0.5, 0.6]])]
+        >>> centers = [(0, 0), (1, 1)]
+        >>> correlation_maps = calculate_correlation(reference_img, subset_imgs, centers)
+    """
     # Calculate the shift and center coordinates for the reference image
- 
+
     correlations = []
 
     # Calculate shifts, centers, and correlation maps for each subset image with respect to the reference image
     for subset_image, subset_center in zip(subset_images, subset_centers):
-        correlation = scipy.signal.correlate2d(subset_image, reference_image, mode='valid', boundary='symm')
+        correlation = scipy.signal.correlate2d(subset_image, reference_image, mode="valid", boundary="symm")
         correlations.append(correlation)
 
     return correlations
 
+
 def calculate_normalized_correlation(reference_image, subset_images, normalize=True):
     """
     Calculate normalized correlation maps between a reference image and a list of subset images.
-    
+
     This function calculates the normalized correlation maps between a reference image and a list of subset images.
     The correlation maps represent the similarity between the reference image and each subset image after normalization.
-    
+
     Parameters:
         reference_image: The reference image to which the subset images will be compared. [numpy.ndarray]
                          Should be a 2D numpy array representing the grayscale image.
@@ -121,18 +122,18 @@ def calculate_normalized_correlation(reference_image, subset_images, normalize=T
                        Each subset image should be a 2D numpy array of the same dtype and dimensions as the reference image.
         normalize: A boolean flag to determine whether to normalize the reference and subset images. [bool, optional]
                    If True, the images will be normalized before calculating the correlation. Defaults to True.
-    
+
     Returns:
         List[numpy.ndarray]: A list of 2D numpy arrays representing the normalized correlation maps for each subset image.
                              Each correlation map represents the similarity between the reference image and the respective subset image.
-    
+
     Example:
         >>> reference_img = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6], [0.7, 0.8, 0.9]])
         >>> subset_imgs = [np.array([[0.1, 0.2], [0.4, 0.5]]), np.array([[0.8, 0.9], [0.5, 0.6]])]
         >>> normalized_correlation_maps = calculate_normalized_correlation(reference_img, subset_imgs, normalize=True)
     """
     # Calculate the shift and center coordinates for the reference image
- 
+
     correlations = []
 
     # Normalize the reference image if needed
@@ -141,15 +142,11 @@ def calculate_normalized_correlation(reference_image, subset_images, normalize=T
 
     # Calculate shifts, centers, and correlation maps for each subset image with respect to the reference image
     for subset_image in tqdm(zip(subset_images)):
-        
-        
         if normalize:
             subset_image = normalize_image(subset_image[0])
- 
-        
-        correlation =scipy.signal.correlate2d(reference_image,subset_image, mode='valid', boundary='symm')
+
+        correlation = scipy.signal.correlate2d(reference_image, subset_image, mode="valid", boundary="symm")
         correlations.append(correlation)
- 
 
     return correlations
 
@@ -157,10 +154,10 @@ def calculate_normalized_correlation(reference_image, subset_images, normalize=T
 def fit_gaussian_and_find_peak(correlation_map, window_shape, subset_center, plot=False):
     """
     Fit a gaussian function to a window of the correlation map and find the peak coordinates.
-    
+
     This function fits a quadratic function to a window of the correlation map centered around the
     specified subset_center. It then identifies the peak coordinates within the window.
-    
+
     Parameters:
         correlation_map: The correlation map used for fitting and peak detection. [numpy.ndarray]
                          Should be a 2D numpy array representing the correlation map.
@@ -171,11 +168,11 @@ def fit_gaussian_and_find_peak(correlation_map, window_shape, subset_center, plo
         plot: A boolean flag to determine whether to plot the fitting results. [bool, optional]
               If True, the function will generate a plot showing the measured and fitted intensity data.
               Defaults to False.
-    
+
     Returns:
         tuple: A tuple (x_peak, y_peak) representing the peak coordinates in the fitted quadratic function. [tuple]
                The coordinates are relative to the corrected center of the subset.
-    
+
     Notes:
         - The correlation_map should be a 2D numpy array with proper dimensions.
         - The window_shape should be smaller than the dimensions of the correlation_map for accurate fitting.
@@ -189,10 +186,10 @@ def fit_gaussian_and_find_peak(correlation_map, window_shape, subset_center, plo
 
     # Define a window around the corrected center
     D = 5
-    window = correlation_map[cx - window_height // D: cx + window_height // D + 1,
-                             cy - window_width // D: cy + window_width // D + 1]
+    window = correlation_map[
+        cx - window_height // D : cx + window_height // D + 1, cy - window_width // D : cy + window_width // D + 1
+    ]
 
-    
     # Create a grid for fitting (relative to the corrected center)
     x_fit = np.arange(-window_width // D, window_width // D + 1)
     y_fit = np.arange(-window_height // D, window_height // D + 1)
@@ -205,22 +202,22 @@ def fit_gaussian_and_find_peak(correlation_map, window_shape, subset_center, plo
 
     ### Note: This could equally be done with a quadratic fn, maybe work for
     ###       another day/person.
-    
+
     # # Fit a quadratic function to the window data
     # def quadratic_func(coords, a, b, c):
     #     x, y = coords
     #     return a * x**2 + b * x + c * y**2
 
     # fit_params, _ = scipy.optimize.curve_fit(quadratic_func, (x_fit, y_fit), z_fit)
-   
+
     # # Find the peak coordinates of the fitted quadratic function
     # x_peak = -fit_params[1] / (2 * fit_params[0])
     # y_peak = -fit_params[2] / (2 * fit_params[0])
 
-        # Define the 2D Gaussian function
+    # Define the 2D Gaussian function
     def gaussian_func(coords, A, x0, y0, sigma_x, sigma_y):
         x, y = coords
-        return A * np.exp(-((x - x0)**2 / (2 * sigma_x**2) + (y - y0)**2 / (2 * sigma_y**2)))
+        return A * np.exp(-((x - x0) ** 2 / (2 * sigma_x**2) + (y - y0) ** 2 / (2 * sigma_y**2)))
 
     # Initial guess for the parameters (you may want to provide better initial values)
     initial_guess = [1.0, 0.0, 0.0, 1.0, 1.0]
@@ -228,74 +225,71 @@ def fit_gaussian_and_find_peak(correlation_map, window_shape, subset_center, plo
     try:
         # Use curve_fit to find the optimal parameters that fit the Gaussian function
         fit_params, _ = scipy.optimize.curve_fit(gaussian_func, (x_fit, y_fit), z_fit, p0=initial_guess)
-        
+
         # Find the peak coordinates and peak intensities of the fitted Gaussian function
         A_fit, x0_fit, y0_fit, sigma_x_fit, sigma_y_fit = fit_params
-        
-        # Calculate the peak coordinates
-        x_peak = x0_fit  
-        y_peak = y0_fit 
 
-            
+        # Calculate the peak coordinates
+        x_peak = x0_fit
+        y_peak = y0_fit
+
         # Calculate the peak coordinates relative to the corrected center
         dx, dy = subset_center
-    
-        
+
         if plot:
             # Generate fitted data and plot it
             fitted_data = gaussian_func((x_fit, y_fit), *fit_params)
-        
+
             # Reshape the variables to 2D
             variables_list = [x_fit, y_fit, z_fit, fitted_data]  # Add all your variables here
             variables_list = [reshape_to_2d(variable) for i, variable in enumerate(variables_list)]
             [x_fit, y_fit, z_fit, fitted_data] = variables_list
-        
+
             # Create a 1x2 figure
             fig = plt.figure(figsize=(16, 6))
-        
+
             # First subplot: Measured Intensity
-            ax1 = fig.add_subplot(121, projection='3d')
-            surf1 = ax1.plot_surface(x_fit, y_fit, z_fit, cmap='bone')
-            ax1.set_xlabel('x', fontsize=14)
-            ax1.set_ylabel('y', fontsize=14)
-            ax1.set_zlabel('z', fontsize=14)
-            ax1.tick_params(axis='both', which='major', labelsize=12)
-            ax1.set_title('Measured Intensity', fontsize=16)
+            ax1 = fig.add_subplot(121, projection="3d")
+            surf1 = ax1.plot_surface(x_fit, y_fit, z_fit, cmap="bone")
+            ax1.set_xlabel("x", fontsize=14)
+            ax1.set_ylabel("y", fontsize=14)
+            ax1.set_zlabel("z", fontsize=14)
+            ax1.tick_params(axis="both", which="major", labelsize=12)
+            ax1.set_title("Measured Intensity", fontsize=16)
             cbar1 = fig.colorbar(surf1, ax=ax1, pad=0.1, shrink=0.6)  # Adjust the shrink parameter here
             cbar1.ax.tick_params(labelsize=12)
-            cbar1.set_label('Intensity', fontsize=14)
-        
+            cbar1.set_label("Intensity", fontsize=14)
+
             # Second subplot: Fitted Intensity
-            ax2 = fig.add_subplot(122, projection='3d')
-            surf2 = ax2.plot_surface(x_fit, y_fit, fitted_data, cmap='inferno', alpha=0.7)
-            ax2.set_xlabel('x', fontsize=14)
-            ax2.set_ylabel('y', fontsize=14)
-            ax2.set_zlabel('z', fontsize=14)
-            ax2.tick_params(axis='both', which='major', labelsize=12)
-            ax2.set_title('Fitted Intensity', fontsize=16)
+            ax2 = fig.add_subplot(122, projection="3d")
+            surf2 = ax2.plot_surface(x_fit, y_fit, fitted_data, cmap="inferno", alpha=0.7)
+            ax2.set_xlabel("x", fontsize=14)
+            ax2.set_ylabel("y", fontsize=14)
+            ax2.set_zlabel("z", fontsize=14)
+            ax2.tick_params(axis="both", which="major", labelsize=12)
+            ax2.set_title("Fitted Intensity", fontsize=16)
             cbar2 = fig.colorbar(surf2, ax=ax2, pad=0.1, shrink=0.6)  # Adjust the shrink parameter here
             cbar2.ax.tick_params(labelsize=12)
-            cbar2.set_label('Intensity', fontsize=14)
-        
+            cbar2.set_label("Intensity", fontsize=14)
+
             # Adjust view angles for better visualization
             ax1.view_init(elev=20, azim=-40)
             ax2.view_init(elev=20, azim=-40)
-        
-            plt.suptitle('Quadratic Fit and Peak Detection', fontsize=18)
+
+            plt.suptitle("Quadratic Fit and Peak Detection", fontsize=18)
             plt.tight_layout()
             plt.show()
-    
-    except(RuntimeError):
+
+    except RuntimeError:
         x_peak = 0
         y_peak = 0
 
     return x_peak, y_peak
 
-def process_subset_images(reference_image,
-                          subset_images,
-                          subset_centers,
-                          plot=False,
-                         method = calculate_normalized_correlation):
+
+def process_subset_images(
+    reference_image, subset_images, subset_centers, plot=False, method=calculate_normalized_correlation
+):
     """
     Process a set images (nominally subsets of a larger image) by calculating shifts and correlation maps with respect to a reference image.
 
@@ -338,97 +332,97 @@ def process_subset_images(reference_image,
         >>> centers = [(0, 0), (1, 1)]
         >>> results = process_subset_images(reference_img, subset_imgs, centers, plot=True)
     """
-    
+
     # Initialize a dictionary to store the results for each subset image
-    results = {
-        'subset_centers': [],
-        'subpixel_shifts': [],
-        'shifts': []
-    }
- 
+    results = {"subset_centers": [], "subpixel_shifts": [], "shifts": []}
+
     # Calculate shifts, centers, and correlation maps with respect to the reference image
-    correlations = method(reference_image,  subset_images, subset_centers)
+    correlations = method(reference_image, subset_images, subset_centers)
 
     # Plot individual graphs for each subset image (if plot_graphs is True)
 
-    for i, (subset_image, center, correlation) in (enumerate(zip(subset_images, subset_centers, correlations), start=0)):
-        
+    for i, (subset_image, center, correlation) in enumerate(
+        zip(subset_images, subset_centers, correlations), start=0
+    ):
         w = subset_image.shape[0]
 
-        correlation_magnitude = np.abs(correlation)       
+        correlation_magnitude = np.abs(correlation)
         max_corr_position = np.unravel_index(np.argmax(correlation_magnitude), correlation_magnitude.shape)
-        
-        corr_peaks = (max_corr_position[0] + w//2 - center[0], 
-                      max_corr_position[1] + w//2 - center[1])
-        
-        
-        
-    
+
+        corr_peaks = (max_corr_position[0] + w // 2 - center[0], max_corr_position[1] + w // 2 - center[1])
+
         # Plot individual graphs for each subset image (if plot is True)
         if plot:
             plt.figure(figsize=(15, 5))
-        
+
             # Plot the subset image
             ax1 = plt.subplot(1, 3, 1)
-            im1 = ax1.imshow(subset_image, cmap='viridis', origin='upper')
-            ax1.set_title(f'Subset Image {i}', fontsize=16)
-            ax1.set_xlabel('x (pixels)', fontsize=16)
-            ax1.set_ylabel('y (pixels)', fontsize=16)
-            ax1.tick_params(axis='both', which='major', labelsize=14)
+            im1 = ax1.imshow(subset_image, cmap="viridis", origin="upper")
+            ax1.set_title(f"Subset Image {i}", fontsize=16)
+            ax1.set_xlabel("x (pixels)", fontsize=16)
+            ax1.set_ylabel("y (pixels)", fontsize=16)
+            ax1.tick_params(axis="both", which="major", labelsize=14)
             divider1 = make_axes_locatable(ax1)
             cax1 = divider1.append_axes("right", size="5%", pad=0.1)
             cbar1 = plt.colorbar(im1, cax=cax1)
-            cbar1.set_label('Intensity', fontsize=14)
+            cbar1.set_label("Intensity", fontsize=14)
             cbar1.ax.tick_params(labelsize=12)
-        
+
             # Plot the larger image with the center position and subset center
             ax2 = plt.subplot(1, 3, 2)
-            im2 = ax2.imshow(reference_image, cmap='viridis', origin='upper')
-            ax2.set_title('Reference Speckle', fontsize=16)
-            ax2.set_xlabel('x (pixels)', fontsize=16)
-            ax2.set_ylabel('y (pixels)', fontsize=16)
-            ax2.scatter(center[1], center[0], color='blue', marker='x', s=100, label='Subset Center')
+            im2 = ax2.imshow(reference_image, cmap="viridis", origin="upper")
+            ax2.set_title("Reference Speckle", fontsize=16)
+            ax2.set_xlabel("x (pixels)", fontsize=16)
+            ax2.set_ylabel("y (pixels)", fontsize=16)
+            ax2.scatter(center[1], center[0], color="blue", marker="x", s=100, label="Subset Center")
             ax2.legend()
-            ax2.tick_params(axis='both', which='major', labelsize=14)
+            ax2.tick_params(axis="both", which="major", labelsize=14)
             divider2 = make_axes_locatable(ax2)
             cax2 = divider2.append_axes("right", size="5%", pad=0.1)
             cbar2 = plt.colorbar(im2, cax=cax2)
-            cbar2.set_label('Intensity', fontsize=14)
+            cbar2.set_label("Intensity", fontsize=14)
             cbar2.ax.tick_params(labelsize=12)
-        
+
             # Plot the magnitude of the correlation map with the center position and maximum correlation location
             ax3 = plt.subplot(1, 3, 3)
-            im3 = ax3.imshow(correlation_magnitude, cmap='viridis', origin='upper')
-            ax3.set_title(f'Correlation Map {i}', fontsize=16)
-            ax3.set_xlabel('$\Delta x$', fontsize=16)
-            ax3.set_ylabel('$\Delta y$', fontsize=16)
-            ax3.scatter(max_corr_position[1], max_corr_position[0], color='green', marker='x', s=100, label='Max Correlation')
+            im3 = ax3.imshow(correlation_magnitude, cmap="viridis", origin="upper")
+            ax3.set_title(f"Correlation Map {i}", fontsize=16)
+            ax3.set_xlabel("$\Delta x$", fontsize=16)
+            ax3.set_ylabel("$\Delta y$", fontsize=16)
+            ax3.scatter(
+                max_corr_position[1],
+                max_corr_position[0],
+                color="green",
+                marker="x",
+                s=100,
+                label="Max Correlation",
+            )
             ax3.legend()
-            ax3.tick_params(axis='both', which='major', labelsize=14)
+            ax3.tick_params(axis="both", which="major", labelsize=14)
             divider3 = make_axes_locatable(ax3)
             cax3 = divider3.append_axes("right", size="5%", pad=0.1)
             cbar3 = plt.colorbar(im3, cax=cax3)
-            cbar3.set_label('Magnitude', fontsize=14)
+            cbar3.set_label("Magnitude", fontsize=14)
             cbar3.ax.tick_params(labelsize=12)
-        
+
             plt.tight_layout()
             plt.show()
 
-        # Fit a quadratic function to the correlation map and find its peak within a specified window        
-        peak_x, peak_y = fit_gaussian_and_find_peak(correlation_magnitude,
-                                                                         subset_image.shape,
-                                                                         subset_centers[i],
-                                                                         plot = plot)
+        # Fit a quadratic function to the correlation map and find its peak within a specified window
+        peak_x, peak_y = fit_gaussian_and_find_peak(
+            correlation_magnitude, subset_image.shape, subset_centers[i], plot=plot
+        )
         peaks = (peak_x + corr_peaks[0], peak_y + corr_peaks[1])
- 
+
         # Append the values to the corresponding lists in the results dictionary
-        results['subset_centers'].append(center)
-        results['subpixel_shifts'].append(peaks)
-        results['shifts'].append(corr_peaks)
+        results["subset_centers"].append((center[0], center[1]))
+        results["subpixel_shifts"].append(peaks)
+        results["shifts"].append(corr_peaks)
 
     return results
 
-def process_single_image(reference_image, sample_image, window_size, step_size, padding=0, plot=False):
+
+def process_single_image(reference_image, sample_image, window_size, step_size, padding=0, plot=False, extra_metadata = {}):
     """
     Process a single image by extracting subsets, computing correlation, and subpixel shifts.
 
@@ -454,11 +448,20 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
     :return: dict
         A dictionary containing the processed results for each subset image.
         The dictionary includes the following keys:
-            - 'subset_centers': A list of tuples (row_center, col_center) representing the centers of the subset images.
-            - 'subpixel_shifts': A list of tuples (subpixel_shift_x, subpixel_shift_y) indicating the subpixel shifts
-                                between the reference image and each subset image.
-            - 'shifts': A list of tuples (shift_x, shift_y) indicating the shifts between the reference image and
-                        each subset image, computed as the peak positions in the correlation maps.
+            - 'coords_x': numpy.ndarray
+                A 1D array containing the horizontal (x) coordinates of the centers of the subset images.
+            - 'coords_y': numpy.ndarray
+                A 1D array containing the vertical (y) coordinates of the centers of the subset images.
+            - 'shifts_x': numpy.ndarray
+                A 1D array containing the horizontal (x) shifts between the reference image and each subset image,
+                computed as the peak positions in the correlation maps.
+            - 'shifts_y': numpy.ndarray
+                A 1D array containing the vertical (y) shifts between the reference image and each subset image,
+                computed as the peak positions in the correlation maps.
+            - 'subpixel_shifts_x': numpy.ndarray
+                A 1D array containing the horizontal (x) subpixel shifts between the reference image and each subset image.
+            - 'subpixel_shifts_y': numpy.ndarray
+                A 1D array containing the vertical (y) subpixel shifts between the reference image and each subset image.
 
     :Example:
         >>> import numpy as np
@@ -480,17 +483,43 @@ def process_single_image(reference_image, sample_image, window_size, step_size, 
         displaying the subset image, reference image, and magnitude of the correlation map.
         The function returns a dictionary containing the processed results for each subset image,
         including the subset centers, subpixel shifts, and shifts computed as peak positions in the correlation maps.
-        The results can be used for further analysis or visualization.
+        The results are returned as numpy arrays and can be used for further analysis or visualization.
 
     :Note:
         - The 'reference_image' and 'sample_image' should be 2D numpy arrays with proper dimensions.
         - The 'window_size' and 'step_size' should be positive integers.
         - The 'padding' should be a non-negative integer.
     """
-    subset, centers = get_subsets(sample_image, window_size = window_size, step_size = step_size, padding = padding)
     
-    results = process_subset_images(reference_image,
-                                    subset_images = subset,
-                                    subset_centers = centers,
-                                    plot=plot)
+    assert type(extra_metadata) == dict, "Metadata should be in dictionary format"
+    
+    subset, centers = get_subsets(sample_image, window_size=window_size, step_size=step_size, padding=padding)
+    shift_results = process_subset_images(reference_image, subset_images=subset, subset_centers=centers, plot=plot)
+
+    results = {}
+    
+    # Add metadata to results
+    results.update(extra_metadata)
+    
+    # Convert list of tuples to NumPy arrays for better structure
+    coords_x, coords_y, shifts_x, shifts_y = construct_arrays(
+        shift_results["subset_centers"], shift_results["shifts"]
+    )
+    _, _, subpixel_shifts_x, subpixel_shifts_y = construct_arrays(
+        shift_results["subset_centers"], shift_results["subpixel_shifts"]
+    )
+
+    # Store NumPy arrays in the dictionary with descriptive keys
+    results["coords_x"] = coords_x  # Horizontal (x) coordinates of the centers of the subset images.
+    results["coords_y"] = coords_y  # Vertical (y) coordinates of the centers of the subset images.
+    results["shifts_x"] = shifts_x  # Horizontal (x) shifts between the reference image and each subset image.
+    results["shifts_y"] = shifts_y  # Vertical (y) shifts between the reference image and each subset image.
+    results[
+        "subpixel_shifts_x"
+    ] = subpixel_shifts_x  # Horizontal (x) subpixel shifts between the reference image and each subset image.
+    results[
+        "subpixel_shifts_y"
+    ] = subpixel_shifts_y  # Vertical (y) subpixel shifts between the reference image and each subset image.
+    
+    
     return results

@@ -4,9 +4,8 @@ from numpy.fft import fftshift as fftshift
 from numpy.fft import ifftshift as ifftshift
 from numpy.fft import fft2 as fft2
 from numpy.fft import ifft2 as ifft2
-from numpy.fft import fftfreq as fftfreq
 
-from scipy.ndimage.filters import gaussian_filter
+
 from math import pi as pi
 from math import floor as floor
 
@@ -36,7 +35,9 @@ def kottler(dX, dY):
     Nx, Ny = dX.shape
     dqx = 2 * pi / Nx
     dqy = 2 * pi / Ny
-    Qx, Qy = np.meshgrid((np.arange(0, Ny) - floor(Ny / 2) - 1) * dqy, (np.arange(0, Nx) - floor(Nx / 2) - 1) * dqx)
+    Qx, Qy = np.meshgrid(
+        (np.arange(0, Ny) - floor(Ny / 2) - 1) * dqy, (np.arange(0, Nx) - floor(Nx / 2) - 1) * dqx
+    )
 
     polarAngle = np.arctan2(Qx, Qy)
     ftphi = fftshift(fft2(dX + i * dY)) * np.exp(i * polarAngle)

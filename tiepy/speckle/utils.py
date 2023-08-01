@@ -2,19 +2,20 @@
 
 import numpy as np
 
+
 def reshape_to_2d(data):
     """
     Reshape a 1D data array into a 2D array.
-    
+
     This function takes a 1D data array and reshapes it into a 2D array of dimensions (nx, ny), where nx and ny
     are the square roots of the length of the input data.
-    
+
     Parameters:
         data: The 1D data array to be reshaped. [numpy.ndarray]
-    
+
     Returns:
         numpy.ndarray: A 2D numpy array of dimensions (nx, ny) representing the reshaped data.
-    
+
     Example:
         >>> data = np.array([1, 2, 3, 4, 5, 6])
         >>> reshaped_data = reshape_to_2d(data)
@@ -40,7 +41,7 @@ def get_subsets(image, window_size, step_size, padding=0):
         The padding distance from the image boundaries. The window will not be drawn within this distance
         from the edges of the image. Default is 0.
 
-    :return: 
+    :return:
         subsets : list of numpy.ndarray
             A list containing the cropped subsets of the input image.
 
@@ -83,8 +84,90 @@ def get_subsets(image, window_size, step_size, padding=0):
 
     for i in range(half_w + padding, nx - half_w - padding, step_size):
         for j in range(half_w + padding, ny - half_w - padding, step_size):
-            subset = image[i - half_w:i + half_w, j - half_w:j + half_w]
+            subset = image[i - half_w : i + half_w, j - half_w : j + half_w]
             subsets.append(subset)
             centers.append((i, j))
 
     return subsets, centers
+
+
+def calc_subsets_size(image, window_size, step_size, padding=0):
+    nx, ny = image.shape
+
+    half_w = window_size // 2
+
+    x = len([i for i in range(half_w + padding, nx - half_w - padding, step_size)])
+    y = len([j for j in range(half_w + padding, ny - half_w - padding, step_size)])
+
+    print("Number of Subsets: {}".format(x * y))
+
+
+def construct_arrays(coordinates, measurements):
+    """
+    Construct numpy arrays from sorted scan coordinates and measurements.
+
+    :param coordinates: List[tuple]
+        A list of tuples representing the scan coordinates. Each tuple should be in the format (y, x),
+        where y and x are the row and column indices, respectively.
+
+    :param measurements: List[tuple]
+        A list of tuples representing the measurements corresponding to the scan coordinates.
+        Each tuple should contain the measurement values in the format (measurement1, measurement2).
+
+    :return: tuple
+        A tuple (array_x, array_y, array_m1, array_m2) representing the constructed numpy arrays.
+
+        - array_x: numpy.ndarray
+            A 2D numpy array containing the x-coordinates corresponding to the scan coordinates.
+            The shape of this array is determined by the number of unique x values and rows in the scan.
+            Each element (i, j) in the array corresponds to the x-coordinate of the measurement at position (i, j).
+
+        - array_y: numpy.ndarray
+            A 2D numpy array containing the y-coordinates corresponding to the scan coordinates.
+            The shape of this array is determined by the number of unique y values and columns in the scan.
+            Each element (i, j) in the array corresponds to the y-coordinate of the measurement at position (i, j).
+
+        - array_m1: numpy.ndarray
+            A 2D numpy array containing the measurements for parameter 1.
+            The shape of this array is determined by the number of unique x values and rows in the scan.
+            Each element (i, j) in the array represents the measurement for parameter 1 at position (i, j).
+
+        - array_m2: numpy.ndarray
+            A 2D numpy array containing the measurements for parameter 2.
+            The shape of this array is determined by the number of unique x values and rows in the scan.
+            Each element (i, j) in the array represents the measurement for parameter 2 at position (i, j).
+
+    :Example:
+        >>> coordinates = [(0, 0), (0, 1), (1, 0), (1, 1)]
+        >>> measurements = [(10, 20), (30, 40), (50, 60), (70, 80)]
+        >>> array_x, array_y, array_m1, array_m2 = construct_arrays(coordinates, measurements)
+        >>> print(array_x)
+        [[0 1]
+         [0 1]]
+        >>> print(array_y)
+        [[0 0]
+         [1 1]]
+        >>> print(array_m1)
+        [[10 30]
+         [50 70]]
+        >>> print(array_m2)
+        [[20 40]
+         [60 80]]
+
+    :Notes:
+        - The function assumes that the coordinates and measurements are provided as lists of tuples.
+        - The input coordinates should be sorted in a row-major order for accurate construction of the numpy arrays.
+        - The resulting arrays will have the same number of rows as unique y values and the same number of columns as unique x values.
+        - The order of the elements in the measurements list should correspond to the order of coordinates.
+    """
+    unique_x = np.unique([coord[1] for coord in coordinates])
+    unique_y = np.unique([coord[0] for coord in coordinates])
+
+    n, m = len(unique_y), len(unique_x)
+
+    array_x, array_y = np.meshgrid(unique_x, unique_y, indexing="ij")
+
+    array_m1 = np.reshape([meas[1] for meas in measurements], (n, m))
+    array_m2 = np.reshape([meas[0] for meas in measurements], (n, m))
+
+    return array_x.T, array_y.T, array_m1, array_m2

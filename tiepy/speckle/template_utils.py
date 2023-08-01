@@ -1,5 +1,6 @@
 import numpy as np
 
+
 def get_windows(arr, nx, s):
     """
     Extract subsets and their center positions from a square 2D array.
@@ -16,7 +17,7 @@ def get_windows(arr, nx, s):
 
     :raises ValueError: If the input array is not square or if nx is greater than the array dimensions.
     """
-    
+
     # Get the shape of the input array
     n, m = arr.shape
 
@@ -39,8 +40,8 @@ def get_windows(arr, nx, s):
     for i in range(subsets_per_dim):
         for j in range(subsets_per_dim):
             subset = arr[i * s : i * s + nx, j * s : j * s + nx]
-            center_i = i * s 
-            center_j = j * s 
+            center_i = i * s
+            center_j = j * s
             center = (center_j, center_i)
             subsets.append(subset)
             centers.append(center)
@@ -48,12 +49,11 @@ def get_windows(arr, nx, s):
     return subsets, centers
 
 
-
 def generate_gaussian_mask(nx, ny, x0, y0, sigma, w):
     x = np.arange(nx)
     y = np.arange(ny)
     X, Y = np.meshgrid(x, y)
-    dist_squared = (X - x0)**2 + (Y - y0)**2
+    dist_squared = (X - x0) ** 2 + (Y - y0) ** 2
     mask = np.exp(-dist_squared / (2 * sigma**2))
     mask[dist_squared <= w**2] = 1
     mask /= np.max(mask)
